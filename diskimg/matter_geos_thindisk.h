@@ -1,16 +1,5 @@
 #include <cmath>
 
-double diskSigma(double rProjected, double theta){
-    double cosTerm = std::cos(theta);
-    double sigmaOut = (rProjected*rProjected)+(a*a*cosTerm*cosTerm);
-    return sigmaOut;
-}
-
-double diskDelta(double rProjected){
-    double deltaOut = (rProjected*rProjected)+(-2.*rProjected)+(a*a);
-    return deltaOut;
-}
-
 double diskEnergy(double rProjected){
     double energyTop = pow(rProjected,2.) - (2.*rProjected) + a*pow(rProjected,0.5);
     double energyBottom = pow(rProjected,2.) - (3.*rProjected) + (2.*a*pow(rProjected,0.5));
@@ -27,9 +16,10 @@ double planeTdot(double r, double phi, double theta, double time, double rProjec
     double energyDisk = diskEnergy(rProjected);
     double angmomDisk = diskAngmom(rProjected);
     double sinTerm = std::sin(theta);
-    double energyTerm = ((diskSigma(rProjected,theta)*((rProjected*rProjected)+(a*a)))+(2.*rProjected*a*a*sinTerm*sinTerm))*energyDisk;
+    double diskSigma = sigma(rProjected,phi,M_PI/2.,time);
+    double energyTerm = ((diskSigma*((rProjected*rProjected)+(a*a)))+(2.*rProjected*a*a*sinTerm*sinTerm))*energyDisk;
     double angmomTerm = -2.*a*rProjected*angmomDisk;
-    double bottomTerm1 = (diskSigma(rProjected,theta) - (2.*rProjected))*((rProjected*rProjected)+(a*a));
+    double bottomTerm1 = (diskSigma - (2.*rProjected))*((rProjected*rProjected)+(a*a));
     double bottomTerm2 = 2.*rProjected*a*a*sinTerm*sinTerm;
     return (energyTerm+angmomTerm)/(bottomTerm1+bottomTerm2);
 }
@@ -38,9 +28,10 @@ double planePhiDot(double r, double phi, double theta, double time, double rProj
     double energyDisk = diskEnergy(rProjected);
     double angmomDisk = diskAngmom(rProjected);
     double sinTerm = std::sin(theta);
+    double diskSigma = sigma(rProjected,phi,M_PI/2.,time);
     double energyTerm = 2.*a*rProjected*sinTerm*sinTerm*energyDisk;
-    double angmomTerm = (diskSigma(rProjected,theta) - (2.*rProjected))*angmomDisk;
-    double bottomTerm1 = (diskSigma(rProjected,theta) - (2.*rProjected))*((rProjected*rProjected)+(a*a))*sinTerm*sinTerm;
+    double angmomTerm = (diskSigma - (2.*rProjected))*angmomDisk;
+    double bottomTerm1 = (diskSigma - (2.*rProjected))*((rProjected*rProjected)+(a*a))*sinTerm*sinTerm;
     double bottomTerm2 = 2.*rProjected*a*a*sinTerm*sinTerm*sinTerm*sinTerm;
     return (energyTerm+angmomTerm)/(bottomTerm1+bottomTerm2);
 }
@@ -66,11 +57,11 @@ double diskPhiDot(double r, double phi, double theta, double time, double scaleH
     double diskTdotValue = diskTdot(r,phi,theta,time,scaleHeightValue,rProjected);
     return diskTdotValue*diskPhiVelValue;
 }
-    
+
 double diskThDot(double r, double phi, double theta, double time, double scaleHeightValue, double rProjected){
 	return 0.;
 	}
-	
+
 double diskRdot(double r, double phi, double theta, double time, double scaleHeightValue, double rProjected){
 	return 0.;
 	}

@@ -1,16 +1,5 @@
 #include <cmath>
 
-double sigma(double r, double phi, double theta, double time){
-    double cosTerm = std::cos(theta);
-    double sigmaOut = (r*r)+(a*a*cosTerm*cosTerm);
-	return sigmaOut;
-	}
-	
-double delta(double r, double phi, double theta, double time){
-    double deltaOut = (r*r)+(-2.*r)+(a*a);
-	return deltaOut;
-	}
-
 double tdot(double r, double phi, double theta, double time){
     double sinTerm = std::sin(theta);
     double energyTerm = ((sigma(r,phi,theta,time)*((r*r)+(a*a)))+(2.*r*a*a*sinTerm*sinTerm))*energy;
@@ -38,7 +27,7 @@ double thdotsq(double r, double phi, double theta, double time){
     double bottomTerm = sigma(r,phi,theta,time)*sigma(r,phi,theta,time);
 	return topTerm/bottomTerm;
 	}
-	
+
 double rdotsq(double r, double phi, double theta, double time){
 	double energyTerm = energy*tdot(r, phi, theta, time);
 	double angmomTerm = -1.*angmom*phidot(r, phi, theta, time);
