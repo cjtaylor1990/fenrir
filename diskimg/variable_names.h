@@ -1,7 +1,7 @@
 #include <cmath>
 
 //Calculating radius of event horizon
-double rEvent = 1. - pow(1.-(a*a),0.5);
+double rEvent = 1. + pow(1.-(a*a),0.5);
 
 //Calculating the inner-most stable orbital radius
 double z1 = 1. + (pow(1-a*a,(1./3.))*((pow(1+a,(1./3.)))+(pow(1-a,(1./3.)))));
@@ -52,6 +52,3 @@ double dStep; //step size variable that will be refined over integration
 double rSqrtSwitch; //switch variable that determines if rdot is negative or positive
 double thSqrtSwitch; //switch variable that determines if thetadot is negative or positive
 double rLimit = rEvent + horizonStop;  //minimum radial distance (currently r_horizon + 0.01)
-
-//Defining sign of spin term in angular velocity of disk in midplane
-double spinTermDisk;

@@ -17,4 +17,4 @@ double horizonStop = 0.01;  //minimum radial distance from event horizon before 
 double tolerance = 1000.; //Tolerance for automatic step refinement. The larger, the more finely sampled.
 
 //Output .txt file name
-const char* outFileName = "./test_new.txt";///n/a3/cjtaylor/raytrace_thindisk/raytrace_data/mcmc_test_a09_i15_acc0.txt";
+const char* outFileName = "./test_new2.txt";///n/a3/cjtaylor/raytrace_thindisk/raytrace_data/mcmc_test_a09_i15_acc0.txt";
