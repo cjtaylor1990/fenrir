@@ -8,15 +8,6 @@
 //    return std::acos((heightFrontTerm*(1 - sqrt(rIsco/((radius*std::sin(theta))))))/radius);
 //}
 
-double scaleHeightTheta(double radius, double theta){
-  double scaleHTprojR = radius*std::sin(theta);
-  if (scaleHTprojR < rIsco){
-    return M_PI/2.;
-  }
-  else{
-    return std::acos((heightFrontTerm*(1 - sqrt(rIsco/scaleHTprojR)))/radius);
-  }
-}
 
 void propagate(double posVec[4], double momVec[4], double dStep, double tolerance, double maxStep, double rLimit, double rEvent, double scaleHeightValue, double rProjected){
     //Space components are centered at black hole.

@@ -52,3 +52,6 @@ double dStep; //step size variable that will be refined over integration
 double rSqrtSwitch; //switch variable that determines if rdot is negative or positive
 double thSqrtSwitch; //switch variable that determines if thetadot is negative or positive
 double rLimit = rEvent + horizonStop;  //minimum radial distance (currently r_horizon + 0.01)
+
+//Defining sign of spin term in angular velocity of disk in midplane
+double spinTermDisk;

@@ -5,7 +5,7 @@
 #include "variable_names.h"
 #include "metric_kerr.h"
 #include "photon_geos_thindisk.h"
-#include "matter_geos_thindisk.h"
+#include "disk_equations.h"
 #include "propagate_rk4_thindisk.h"
 
 
@@ -16,6 +16,14 @@ int main(int argc, char* argv[]){
 
     //Looping over NxN image plane
     int j,k; //defining looping dummy variables. j is x variable. k is y variable
+
+    //Setting sign of spinTermDisk (switch for angular velocity)
+    if (a < 0){
+      spinTermDisk = -1.;
+    }
+    else{
+      spinTermDisk = 1.;
+    }
 
     j = 0; //setting dummy j to 0
     while (j < n){
