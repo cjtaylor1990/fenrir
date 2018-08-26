@@ -7,7 +7,7 @@
 //double scaleHeightTheta(double radius,double theta){
 //    return std::acos((heightFrontTerm*(1 - sqrt(rIsco/((radius*std::sin(theta))))))/radius);
 //}
-//Function to calculate the disk scale height
+
 double scaleHeightTheta(double radius, double theta){
   double scaleHTprojR = radius*std::sin(theta);
   if (scaleHTprojR < rIsco){
