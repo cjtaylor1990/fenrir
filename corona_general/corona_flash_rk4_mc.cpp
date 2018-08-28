@@ -21,8 +21,6 @@ int main(int argc, char* argv[]){
     std::ofstream myfile;  //Defining the output file to be written to.
     myfile.open (outFileName);  //Opening the output file.
 	
-	//rotOmega = (-1.*gTPh(initRadius,initPhi,initTheta,initTime))/gPhPh(initRadius,initPhi,initTheta,initTime);
-	
 	//!!! Move to header file
     //Calculating radius of event horizon
     double rEvent = 1. + pow(1.-(a*a),0.5);
@@ -32,11 +30,9 @@ int main(int argc, char* argv[]){
     double scaleHeightValue;  //Defining the variable that will hold the scale height where the photon ends up
     double rProjected;  //Defining the variable that will hold the radial distance from the final placement of the photon to the black hole, projected onto the plane
 
-    //Looping over sky image (Nx2N)
-    int j,k;  //Defining integration dummy variables. J loops over alpha (verticle angle) while K loops over the horizontal angle (beta)
+    //Dummy variable
+    int j;
     
-    //!!! Move to header file
-    double imgAlpha,imgBeta;  //Defining the angle variables
     srand(time(NULL));
     
     //!!! Could do this calculation in a header file
