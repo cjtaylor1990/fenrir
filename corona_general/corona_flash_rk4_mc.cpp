@@ -6,11 +6,11 @@
 #include "ic1_rk4_corona_mc.h"
 #include "metric_kerr.h"
 #include "global_variables.h"
+#include "corona_functions.h"
 #include "photon_geos_thindisk.h"
 #include "matter_geos_thindisk.h"
 #include "propagate_rk4_thindisk.h"
 #include "flash_angmom_carter.h"
-#include "corona_basis.h"
 #include "photmom_rest_iso.h"
 #include "photmom.h"
 #include "lnrf_basis.h"
@@ -29,44 +29,13 @@ int main(int argc, char* argv[]){
     int j;
     
     //Finding initial positions
-    findPosition();
+    findPosition(); //in corona_functions.h
     
     //Finding rotational velocity Omega (dphi/dt)
-    findOmega();
+    findOmega(); //in corona_functions.h
     
-    //!!! Could do this calculation in a header file
     //Calculating the corona orthonormal tetrad components
-    double eTTval,eTPhVal,eRRval,eThThVal,ePhTval,ePhPhVal;
-    eTTval = eTT(initRadius,initPhi,initTheta,initTime,rotOmega);
-    eTPhVal = eTPh(initRadius,initPhi,initTheta,initTime,rotOmega);
-    eRRval = eRR(initRadius,initPhi,initTheta,initTime,rotOmega);
-    eThThVal = eThTh(initRadius,initPhi,initTheta,initTime,rotOmega);
-    ePhTval = ePhT(initRadius,initPhi,initTheta,initTime,rotOmega);
-    ePhPhVal = ePhPh(initRadius,initPhi,initTheta,initTime,rotOmega);
-    
-    ///!!! Could do this calculation in header file
-    //Constructing the corona tetrad vectors
-    double eTvec[4],eRvec[4],eThVec[4],ePhVec[4];
-    //Time basis vector
-    eTvec[0] = eTTval;
-    eTvec[1] = 0.;
-    eTvec[2] = 0.;
-    eTvec[3] = eTPhVal;
-    //Radial basis vector
-    eRvec[0] = 0.;
-    eRvec[1] = eRRval;
-    eRvec[2] = 0.;
-    eRvec[3] = 0.;
-    //Theta basis vector
-    eThVec[0] = 0.;
-    eThVec[1] = 0.;
-    eThVec[2] = eThThVal;
-    eThVec[3] = 0.;
-    //Phi basis vector
-    ePhVec[0] = ePhTval;
-    ePhVec[1] = 0.;
-    ePhVec[2] = 0.;
-    ePhVec[3] = ePhPhVal;
+	findTetrad(); //in corona_functions.h
     
     //Calculating value of metric components at corona position
     double gTTval,gTPhVal,gRRval,gThThVal,gPhTval,gPhPhVal;
@@ -169,7 +138,7 @@ int main(int argc, char* argv[]){
       lorentzVelVec[3] = (-1.*lnrfOmega(posVec[1],posVec[3],posVec[2],posVec[0])*ePsi(posVec[1],posVec[3],posVec[2],posVec[0])*diskVelVec[0])+(ePsi(posVec[1],posVec[3],posVec[2],posVec[0])*diskVelVec[3]);
       lorentzVelSq = ((lorentzVelVec[1]*lorentzVelVec[1]) + (lorentzVelVec[2]*lorentzVelVec[2]) + (lorentzVelVec[3]*lorentzVelVec[3]))/(lorentzVelVec[0]*lorentzVelVec[0]);
       lorentz = 1./sqrt(1.-lorentzVelSq);//diskVelVec[0]*sqrt(sigma(posVec[1],posVec[3],posVec[2],posVec[0])*delta(posVec[1],posVec[3],posVec[2],posVec[0])/aFunct(posVec[1],posVec[3],posVec[2],posVec[0]));
-
+	  
       //Printing to output file
       //myfile << imgAlpha << " " << imgBeta << " " << gammaVelVec[0] << " " << gamma << " " << hitDiskSwitch << "\n";
       myfile << imgAlpha << " " << imgBeta << " " << (finalEnergy/energy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << " " << lorentz << " " << hitDiskSwitch << "\n";

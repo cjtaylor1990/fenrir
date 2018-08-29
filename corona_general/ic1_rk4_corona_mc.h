@@ -1,6 +1,6 @@
 #include <cmath>
 
-int n = 1000000.;
+int n = 100000.;
 double a = 0.9;
 double accretion = 0.0;
 std::string coronaType = "lp"; //can be equal to 'lp' (lamppost) or 'offaxis' (offaxis corona)

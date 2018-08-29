@@ -42,36 +42,11 @@ double efficiency = 1.-(efficiencyUpper/(rIsco*sqrt(efficiencyLower)));
 //Calculating the front constant for scale height calculation
 double heightFrontTerm = 2.*(3./(2.*efficiency))*accretion;
 
-//Finding initial position of the corona in B-L coordinates
+//Position of the corona in B-L coordinates
 double initTime,initRadius,initTheta,initPhi;
-void findPosition(){
-	if (coronaType == "lp"){
-		initTime = 0.;
-		initRadius = height;
-		initTheta = (M_PI/180.)*0.01;
-		initPhi = 0.;
-	}else{
-		if (isRisco == true){
-			initCylRadius = initCylRadius*rIsco;
-		}
-		double thicknessAtCorona = heightFrontTerm*(1. - sqrt(rIsco/initCylRadius));
-		initTime = 0.;
-		initTheta = std::atan(initCylRadius/(thicknessAtCorona+heightAboveDisk));
-		initRadius = initCylRadius/std::sin(initTheta);
-		initPhi = coronaPhi;
-	}
-}
-//Creating the function to calculate the corona rotational velocity (dphi/dt = rotOmega)
+
+//Corona rotational velocity (dphi/dt = rotOmega)
 double rotOmega;
-void findOmega(){
-	if ((coronaType == "lp") or ((coronaType == "offaxis") and (rotOmegaType == "lnrf"))){
-		rotOmega = 2.*a*initRadius/aFunct(initRadius, initPhi, initTheta, initTime);
-	}else if ((coronaType == "offaxis") and (rotOmegaType == "kep")){
-		rotOmega = 1./(pow(initCylRadius,1.5) + a);
-	}else{
-		rotOmega = rotOmegaInput;
-	}
-}
 
 //Integration variables
 double dStep;  //step size; changed sign
@@ -84,12 +59,5 @@ double hitDiskSwitch;
 //Angles in corona co-moving frame
 double imgAlpha,imgBeta;  //Defining the angle variables
 
-//Functions used in calculating alpha and beta
-double randAlpha(){
-	double randVal = (double)rand()/RAND_MAX;
-	return std::acos(-1. + (2.*randVal));
-}
-double randBeta(){
-	double randVal = (double)rand()/RAND_MAX;
-	return 2.*M_PI*randVal;
-}
+//Basis vectors for orthonormal tetrad at corona
+double eTvec[4],eRvec[4],eThVec[4],ePhVec[4];
