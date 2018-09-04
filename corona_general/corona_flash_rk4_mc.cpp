@@ -8,13 +8,8 @@
 #include "global_variables.h"
 #include "corona_functions.h"
 #include "photon_geos_thindisk.h"
-#include "matter_geos_thindisk.h"
+#include "disk_equations.h"
 #include "propagate_rk4_thindisk.h"
-#include "flash_angmom_carter.h"
-#include "photmom_rest_iso.h"
-#include "photmom.h"
-#include "lnrf_basis.h"
-#include "dblRandGen.h"
 
 //main function
 int main(int argc, char* argv[]){
@@ -29,25 +24,18 @@ int main(int argc, char* argv[]){
     int j;
     
     //Finding initial positions
-    findPosition(); //in corona_functions.h
+    findPosition(initTime,initRadius,initTheta,initPhi,initCylRadius); //in corona_functions.h
     
     //Finding rotational velocity Omega (dphi/dt)
-    findOmega(); //in corona_functions.h
+    findOmega(rotOmega); //in corona_functions.h
     
     //Calculating the corona orthonormal tetrad components
-	findTetrad(); //in corona_functions.h
+	findTetrad(eTvec, eRvec, eThVec, ePhVec); //in corona_functions.h
     
     //Calculating value of metric components at corona position
-    double gTTval,gTPhVal,gRRval,gThThVal,gPhTval,gPhPhVal;
-    gTTval = gTT(initRadius,initPhi,initTheta,initTime);
-    gTPhVal = gTPh(initRadius,initPhi,initTheta,initTime);
-    gRRval = gRR(initRadius,initPhi,initTheta,initTime);
-    gThThVal = gThTh(initRadius,initPhi,initTheta,initTime);
-    gPhTval = gPhT(initRadius,initPhi,initTheta,initTime);
-    gPhPhVal = gPhPh(initRadius,initPhi,initTheta,initTime);
+    findComponents(gTTval, gTPhVal, gRRval, gThThVal, gPhTval, gPhPhVal);
     
     //Calculating trig values at position of corona (used for carter calculation)
-    double corCos,corSin,corCot;
     corCos = std::cos(initTheta);
     corSin = std::sin(initTheta);
     corCot = corCos/corSin;
@@ -58,31 +46,14 @@ int main(int argc, char* argv[]){
       imgAlpha = randAlpha();  //Calculating the image verticle angle (alpha)
       imgBeta = randBeta();  //Calculating the image horizontal angle (beta)
       
-      //!!! Could modularize
       //Calculating corona rest frame photon momentum vector
-      double restPvec[4];
-      restPvec[0] = -1./((gTTval*eTvec[0] + gTPhVal*eTvec[3]) + ((gTTval*ePhVec[0] + gTPhVal*ePhVec[3])*std::sin(imgAlpha)*std::sin(imgBeta)));//restPt();
-      restPvec[1] = restPvec[0]*restPr(imgAlpha,imgBeta);
-      restPvec[2] = restPvec[0]*restPth(imgAlpha,imgBeta);
-      restPvec[3] = restPvec[0]*restPph(imgAlpha,imgBeta);
+      findMomentum(momVec);
       
-      //!!! Could modularize (actually, probably combine with above rest-frame calculation to just clean up code)
-      //Calculating initial B-L photon momentum vector
-      double pVec[4];
-      pVec[0] = pT(restPvec,eTvec,eRvec,eThVec,ePhVec);
-      pVec[1] = pR(restPvec,eTvec,eRvec,eThVec,ePhVec);
-      pVec[2] = pTh(restPvec,eTvec,eRvec,eThVec,ePhVec);
-      pVec[3] = pPh(restPvec,eTvec,eRvec,eThVec,ePhVec);
-      
-      //!!! Could modularize
       //Calculating conserved quantities from B-L momentum vector
-      energy = -1.*((gTTval*pVec[0]) + (gTPhVal*pVec[3]));
-      //angmom = photonAngmom(initRadius,initPhi,initTheta,initTime,imgAlpha,imgBeta);
-      //angmom = restPvec[0]*std::sin(imgAlpha)*std::sin(imgBeta)*corPsi;
-      angmom = (gPhTval*pVec[0]) + (gPhPhVal*pVec[3]);
-      carter = ((gThThVal*pVec[2])*(gThThVal*pVec[2])) - (corCos*corCos*a*a*energy*energy) + (angmom*angmom*corCot*corCot);
+      findConserved(energy,angmom,carter);
       
-      hitDiskSwitch = 0;  //Setting the hitDiskSwitch equal to 0.  Will change to 1 if the photon reaches disk.
+      //Resetting the hitDiskSwitch to zero. Changes to 1 if photon hits disk.
+      hitDiskSwitch = 0;
 
       //Determining the sign of rdot based upon the verticle angle (alpha)
       if (imgAlpha < M_PI/2.){
@@ -107,43 +78,26 @@ int main(int argc, char* argv[]){
       //Propagate the photon to the disk
       propagate(posVec,momVec,dStep,tolerance,maxStep,rLimitLow,rLimitHigh,rEvent,scaleHeightValue,rProjected);
 
-	  //!!! Modularize
       //Calculating the projected radius and the scale height of the disk
       rProjected = posVec[1]*std::sin(posVec[2]);
       scaleHeightValue = heightFrontTerm*(1 - sqrt(rIsco/rProjected));
       
-      //!!! Modularize
       //Calculating the one-form of the photon's momentum 4-vector
-      momOneForm[0] = (gTT(posVec[1],posVec[3],posVec[2],posVec[0])*momVec[0])+(gTPh(posVec[1],posVec[3],posVec[2],posVec[0])*momVec[3]);
-      momOneForm[1] = (gRR(posVec[1],posVec[3],posVec[2],posVec[0])*momVec[1]);
-      momOneForm[2] = (gThTh(posVec[1],posVec[3],posVec[2],posVec[0])*momVec[2]);
-      momOneForm[3] = (gPhT(posVec[1],posVec[3],posVec[2],posVec[0])*momVec[0])+(gPhPh(posVec[1],posVec[3],posVec[2],posVec[0])*momVec[3]);
+      vecToOneForm(posVec, momVec, momOneForm);
       
-      //!!! Modularize
       //Calculating the disk's velocity 4-vector
-      diskVelVec[0] = diskTdot(posVec[1],posVec[3],posVec[2],posVec[0],scaleHeightValue,rProjected);
-      diskVelVec[1] = diskRdot(posVec[1],posVec[3],posVec[2],posVec[0],scaleHeightValue,rProjected);
-      diskVelVec[2] = diskThDot(posVec[1],posVec[3],posVec[2],posVec[0],scaleHeightValue,rProjected);
-      diskVelVec[3] = diskPhiDot(posVec[1],posVec[3],posVec[2],posVec[0],scaleHeightValue,rProjected);
+      diskVelocity(posVec, diskVelVec, scaleHeightValue, rProjected);
 
       //Calculating the final energy of the photon (-1 x dot product of photon one-form momentum and the disk 4-velocity)
       finalEnergy = (momOneForm[0]*diskVelVec[0]) + (momOneForm[1]*diskVelVec[1]) + (momOneForm[2]*diskVelVec[2]) + (momOneForm[3]*diskVelVec[3]);
       finalEnergy = -1.*finalEnergy;
 
-      //!!! Modularize. Also, like could condense this quite a bit
       //Calculating the gamma (Lorentz factor) of the disk element as seen from LNRF.  This is done by multiplying the 4-vector by the basis one-forms (i.e. the dot product)
-      lorentzVelVec[0] = diskVelVec[0]*eNu(posVec[1],posVec[3],posVec[2],posVec[0]);
-      lorentzVelVec[1] = diskVelVec[1]*eMu1(posVec[1],posVec[3],posVec[2],posVec[0]);
-      lorentzVelVec[2] = diskVelVec[2]*eMu2(posVec[1],posVec[3],posVec[2],posVec[0]);
-      lorentzVelVec[3] = (-1.*lnrfOmega(posVec[1],posVec[3],posVec[2],posVec[0])*ePsi(posVec[1],posVec[3],posVec[2],posVec[0])*diskVelVec[0])+(ePsi(posVec[1],posVec[3],posVec[2],posVec[0])*diskVelVec[3]);
-      lorentzVelSq = ((lorentzVelVec[1]*lorentzVelVec[1]) + (lorentzVelVec[2]*lorentzVelVec[2]) + (lorentzVelVec[3]*lorentzVelVec[3]))/(lorentzVelVec[0]*lorentzVelVec[0]);
-      lorentz = 1./sqrt(1.-lorentzVelSq);//diskVelVec[0]*sqrt(sigma(posVec[1],posVec[3],posVec[2],posVec[0])*delta(posVec[1],posVec[3],posVec[2],posVec[0])/aFunct(posVec[1],posVec[3],posVec[2],posVec[0]));
-	  
+      lorentz = findLorentz(posVec,diskVelVec);
+      
       //Printing to output file
-      //myfile << imgAlpha << " " << imgBeta << " " << gammaVelVec[0] << " " << gamma << " " << hitDiskSwitch << "\n";
       myfile << imgAlpha << " " << imgBeta << " " << (finalEnergy/energy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << " " << lorentz << " " << hitDiskSwitch << "\n";
-      //myfile << cFunct(initRadius,initPhi,initTheta,initTime,rotOmega) << " " << eTTval << " " << eTPhVal << " " << ePhTval << " " << ePhPhVal <<"\n";
-      //myfile << imgAlpha << " " << imgBeta << " " << energy << " " << angmom << " " << carter << " " << pVec[2] << " " << restPvec[2] << " " << eThThVal << " " << gThThVal << "\n";
+      
       j++;
     }
     myfile.close();  //Closing the output file.

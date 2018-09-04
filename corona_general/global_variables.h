@@ -17,10 +17,11 @@ double momOneForm[4];
 //Defining energy of photon that is observed co-moving disk frame
 double finalEnergy;
 
-//Defining disk velocity variables to be used to calculate gamma
+//Defining vector for disk velocity at the final position of the photon in B-L coordinates
 double diskVelVec[4];
-double lorentz,lorentzVelSq; //Note that gammaVelSq is the 3-velocity squared and not 4-velocity
-double lorentzVelVec[4];
+
+//Defining Lorentz factor of the disk element of the final position relative to the LNRF that is instantaneously at co-spatial with disk element
+double lorentz;
 
 //Defining two distances of interest to be calculated at end of integration
 double scaleHeightValue;  //Defining the variable that will hold the scale height where the photon ends up
@@ -61,3 +62,9 @@ double imgAlpha,imgBeta;  //Defining the angle variables
 
 //Basis vectors for orthonormal tetrad at corona
 double eTvec[4],eRvec[4],eThVec[4],ePhVec[4];
+
+//Value of metric components at corona position
+double gTTval,gTPhVal,gRRval,gThThVal,gPhTval,gPhPhVal;
+
+//Value of trig functions at position of corona given 
+double corCos,corSin,corCot;
