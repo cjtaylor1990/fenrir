@@ -3,21 +3,28 @@
 #include <cmath>
 #include <stdlib.h>
 #include <time.h>
-#include "ic1_rk4_corona_mc.h"
+#include "ic1_parallel.h"
 #include "metric_kerr.h"
 #include "global_variables.h"
-#include "corona_functions.h"
+#include "corona_functions_test.h"
 #include "photon_geos_thindisk.h"
 #include "disk_equations.h"
 #include "propagate_rk4_thindisk.h"
-#include <mpi.h>
 
 //main function
 int main(int argc, char* argv[]){
 	//Seeding the random number generator
 	srand(seed);
 	
+	//This divides the vertical dimension into parts, where each process does a certain number of rows
+	int n, totProcs, procNum, photonPerProc;
+	n = atoi(argv[1]); //total number of rows/columns for disk image (n x n photons)
+	totProcs = atoi(argv[2]); //rows per process
+	procNum = atoi(argv[3]); //index number of process (starts at 0)
+	photonPerProc = n/totProcs; //number of photons per instance
+	
     //Opening file that will be the output
+    outFileName = argv[4]; //taking name as input from user
     std::ofstream myfile;  //Defining the output file to be written to.
     myfile.open (outFileName);  //Opening the output file.
     
@@ -25,33 +32,40 @@ int main(int argc, char* argv[]){
     int j;
     
     //Finding initial positions
-    findPosition(initTime,initRadius,initTheta,initPhi,initCylRadius); //in corona_functions.h
+    //findPosition(initTime,initRadius,initTheta,initPhi,initCylRadius); //in corona_functions.h
+    //std::cout << initTime << " " << initRadius << " " << initTheta << " " << initPhi << "\n";
+    //initTime = 0.;
+	//initRadius = height;
+	//initTheta = (M_PI/180.)*0.01;
+	//initPhi = 0.;
+	findPosition();
     
     //Finding rotational velocity Omega (dphi/dt)
-    findOmega(rotOmega); //in corona_functions.h
+    //findOmega(rotOmega); //in corona_functions.h
+    findOmega();
     
     //Calculating the corona orthonormal tetrad components
-	findTetrad(eTvec, eRvec, eThVec, ePhVec); //in corona_functions.h
-    
+	//findTetrad(eTvec, eRvec, eThVec, ePhVec); //in corona_functions.h
+    findTetrad();
     //Calculating value of metric components at corona position
-    findComponents(gTTval, gTPhVal, gRRval, gThThVal, gPhTval, gPhPhVal);
+    findComponents();//(gTTval, gTPhVal, gRRval, gThThVal, gPhTval, gPhPhVal);
     
     //Calculating trig values at position of corona (used for carter calculation)
     corCos = std::cos(initTheta);
     corSin = std::sin(initTheta);
     corCot = corCos/corSin;
     
-    j = 0;
-    while (j < n){
+    j = procNum*photonPerProc;
+    while (j < (procNum+1)*photonPerProc){
       //Generating random angles: alpha (verticle), beta (horizontal)
       imgAlpha = randAlpha();  //Calculating the image verticle angle (alpha)
       imgBeta = randBeta();  //Calculating the image horizontal angle (beta)
       
       //Calculating corona rest frame photon momentum vector
-      findMomentum(momVec);
+      findMomentum();//(momVec);
       
       //Calculating conserved quantities from B-L momentum vector
-      findConserved(energy,angmom,carter);
+      findConserved();//(energy,angmom,carter);
       
       //Resetting the hitDiskSwitch to zero. Changes to 1 if photon hits disk.
       hitDiskSwitch = 0;

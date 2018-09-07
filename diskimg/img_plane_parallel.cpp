@@ -1,7 +1,8 @@
+#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include "ic1_rk4_thindisk.h"
+#include "ic1_parallel.h"
 #include "variable_names.h"
 #include "photon_geos_thindisk.h"
 #include "metric_kerr.h"
@@ -10,18 +11,27 @@
 
 
 int main(int argc, char* argv[]){
+	
+	//Getting total number of photons and rows/process from command line
+	//This divides the vertical dimension into parts, where each process does a certain number of rows
+	int n, totProcs, colPerProc, procNum;
+	n = atoi(argv[1]); //total number of rows/columns for disk image (n x n photons)
+	totProcs = atoi(argv[2]); //rows per process
+	procNum = atoi(argv[3]); //index number of process (starts at 0)
+	colPerProc = n/totProcs;
+	
     //Opening file that will be the output
-    outFileName = argv[1]; //taking name as input from user
+    outFileName = argv[4]; //taking name as input from user
     std::ofstream myfile; //opening i/o stream to output to 'myfile' named in ic file
-    myfile.open (outFileName); //opening a new txt file 'myfile' named in ic file
-
+    myfile.open (outFileName); //, std::ios_base::app); //opening a new txt file 'myfile' named in ic file
+	
     //Looping over NxN image plane
     int j,k; //defining looping dummy variables. j is x variable. k is y variable
 
-    j = 0; //setting dummy j to 0
-    while (j < n){
-        k = 0; //setting dummy k to 0 (gets set back to 0 for each j loop)
-        while (k < n){
+    j = procNum*colPerProc; //setting dummy j to 0
+    while (j < (procNum+1)*colPerProc){
+        k = 0;//procNum*rowsPerProc; //resetting k dummy variable to starting value
+        while (k < n){//(procNum+1)*rowsPerProc){
             //std::cout << j << " " << k << "\n";
             imgX = ((j - (n/2.))+0.5)*(imgSize/n); //calculating x value for j value, could always do it outside of loop to not have to constantly do calculation
             imgY = ((k - (n/2))+0.5)*(imgSize/n); //calculating y value for k value
@@ -65,7 +75,8 @@ int main(int argc, char* argv[]){
 
 			//Outputting data to 'myfile': x, y, g, final_t, final_r, final_theta, final_phi, disk_H, pseudo-cylindrical_r
             myfile << imgX << " " << imgY << " " << (energy/finalEnergy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << "\n";
-
+			//std::cout << imgX << " " << imgY << " " << (energy/finalEnergy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << "\n";
+			
             //advancing k by 1
             k++;
         }

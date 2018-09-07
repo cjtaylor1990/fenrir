@@ -1,13 +1,14 @@
 #include <cmath>
 
-int n = 100000.;
-//int photon_for_proc;
+//int n;
+//int phot_per_proc;
+
 double a = 0.9;
 double accretion = 0.0;
 std::string coronaType = "lp"; //can be equal to 'lp' (lamppost) or 'offaxis' (offaxis corona)
 
 //Lamppost variables. Need if coronaType = 'lp'
-double height = 12.;  //lamppost corona height
+double height = 6.;  //lamppost corona height
 
 //Off-axis variables. Need if coronaType = 'offaxis'.
 double initCylRadius = 1.; //cylindrical radius of corona
@@ -23,7 +24,7 @@ double seed = time(NULL);
 //Integration variables
 double maxStep = 100000000;  //Maximal number of steps
 double horizonStop = 0.01; //Minimum distance from photon to event horizon before being lost
-double rLimitHigh = 5000.; //Maximum distance before photon is considered 'escaped to infinity'
+double rLimitHigh = 1000.; //Maximum distance before photon is considered 'escaped to infinity'
 double tolerance = 1000.; //Tolerance for automatic step refinement. The larger, the more finely sampled.
 
 //Output .txt file name
