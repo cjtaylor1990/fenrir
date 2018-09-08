@@ -4,3 +4,7 @@
 *.npy
 *.png
 
+corona_general/txt_to_npy_corona.py
+diskimg/txt_to_npy_diskimg.py
+corona_general/time+irradiation_2d.py
+corona_general/plot_flash_sky_img_new.py
