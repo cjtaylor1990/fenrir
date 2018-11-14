@@ -10,3 +10,4 @@ diskimg/txt_to_npy_diskimg.py
 corona_general/time+irradiation_2d.py
 corona_general/plot_flash_sky_img_new.py
 *.fits
+transfer/transfer_grid.fits
