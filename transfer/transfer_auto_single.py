@@ -5,6 +5,7 @@ import matplotlib
 from astropy.io import fits
 import csv
 import sys
+import os
 
 def rIsco(a):
 	z1 = 1 + (((1-(a*a))**(1./3.))*(((1+a)**(1./3.))+((1-a)**(1./3.))))
@@ -152,5 +153,22 @@ cols = fits.ColDefs([col1, col2, col3, col4, col5])
 #Creating HDUTable
 hdu = fits.BinTableHDU.from_columns(cols)
 
-#Saving FITS file
-hdu.writeto(outFile)
+#Checking to see if file already exists
+existBool = os.path.isfile(outFile)
+
+#If the file already exists, it appends HDUList file to it. If not, it saves a new file.
+if (existBool == True):
+	#Loading FITS file
+	fitsData = fits.open(outFile)
+	
+	#Appending HDUTable object to FITS data
+	fitsData.append(hdu)
+	
+	#Saving FITS file
+	fitsData.writeto(outFile, overwrite=True)
+	
+	#Closing FITS file
+	fitsData.close()
+else:
+	#Saving FITS file
+	hdu.writeto(outFile)
