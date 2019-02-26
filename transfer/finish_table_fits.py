@@ -16,9 +16,9 @@ by a pair of dummy indices.
 
 #Defining relevant file paths
 fileDirectory = "./"
-paramFile = fileDirectory + "param_file_all.txt"
-inFitsFile = fileDirectory + "test_complete_v1.fits"
-outFitsFile = fileDirectory + "test_complete_processed_v1.fits"
+paramFile = fileDirectory + "param_file_sanity_all.txt"
+inFitsFile = fileDirectory + "grid_rad_conv/grid_stripe_new.fits"
+outFitsFile = fileDirectory + "grid_rad_conv/grid_stripe_new_processed.fits"
 
 #Section 1: Loading in paramater txt file data
 table = open(paramFile, 'r')
@@ -51,12 +51,12 @@ del fitsData
 data = fits.open(inFitsFile)
 
 #Creating placeholder angle array
-angleArray = np.zeros(50)+1.
+angleArray = np.zeros(20)+1.
 
 #Creating new HDU columns for placeholder angle array
 cols = []
-cols.append(fits.Column(name = 'cosne1', format = '50E', unit = 'k=1', array = angleArray))
-cols.append(fits.Column(name = 'cosne2', format = '50E', unit = 'k=2', array = angleArray))
+cols.append(fits.Column(name = 'cosne1', format = '20E', unit = 'k=1', array = angleArray))
+cols.append(fits.Column(name = 'cosne2', format = '20E', unit = 'k=2', array = angleArray))
 newCols = fits.ColDefs(cols)
 
 #Naming transfer FITS tables and writing them to new FITS file
