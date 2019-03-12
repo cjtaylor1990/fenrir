@@ -13,8 +13,8 @@ This program is to take in a list of FITS table files and combine them (in the o
 
 #Defining relevant file paths
 fileDirectory = str(sys.argv[1])
-listFile = fileDirectory + "fits_to_combine.txt"
-outFile = str(sys.argv[2])
+listFile = fileDirectory + str(sys.argv[2])#"fits_to_combine.txt"
+outFile = str(sys.argv[3])
 
 #Creating list CSV reader to read in file paths from list .txt file
 list = open(listFile, 'r')
@@ -22,7 +22,7 @@ listReader = csv.reader(list, delimiter = ' ')
 
 #Looping over list file with CSV reader, creating the list of file paths
 inFitsFiles = []
-for entry in listRader:
+for entry in listReader:
 	inFitsFiles.append(fileDirectory + str(entry[0])) 
 
 #Loading in first FITS file in list to which the others will subsequently be appended
