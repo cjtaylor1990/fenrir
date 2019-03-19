@@ -1,13 +1,13 @@
 #include <cmath>
 
-//Function to calculate the disk scale height
-double scaleHeightTheta(double radius, double theta){
+//Function to calculate the disk scale height theta
+double scaleHeightFnct(double radius, double theta){
   double scaleHTprojR = radius*std::sin(theta);
   if (scaleHTprojR < rIsco){
-    return M_PI/2.;
+    return 0.;
   }
   else{
-    return std::acos((heightFrontTerm*(1 - sqrt(rIsco/scaleHTprojR)))/radius);
+    return heightFrontTerm*(1 - sqrt(rIsco/scaleHTprojR));
   }
 }
 

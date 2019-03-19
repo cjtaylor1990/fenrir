@@ -29,7 +29,7 @@ void propagate(double posVec[4], double momVec[4], double dStep, double toleranc
 	int i = 0;
 
     //starting main processing loop.  Will continue while i is less than the maximum number of steps and the radial distance is less than the minimal value specified
-	while ((i < maxStep) && (radius > rLimit) && (theta < scaleHeightTheta(radius,theta))){
+	while ((i < maxStep) && (radius > rLimit) && (radius*cos(theta) > scaleHeightFnct(radius,theta))){
         //First set of k's for rk4 integration
         kTarray[0] = tdot(radius,phi,theta,time);
         kRsqArray[0] = rdotsq(radius,phi,theta,time);

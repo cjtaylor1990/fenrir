@@ -1,27 +1,27 @@
 #include <cmath>
 
 //Calculating radius of event horizon
-double rEvent = 1. + pow(1.-(a*a),0.5);
+double rEvent; //
 
 //Calculating the inner-most stable orbital radius
-double z1 = 1. + (pow(1-a*a,(1./3.))*((pow(1+a,(1./3.)))+(pow(1-a,(1./3.)))));
-double z2 = sqrt((3.*a*a)+(z1*z1));
-double rIsco = 3.+z2-sqrt((3-z1)*(3+z1+(2.*z2)));
+double z1; //
+double z2; //
+double rIsco; //
 
 //Efficiency and accretion rate (Mdot/Eddington) to calculate scale height
-double efficiencyUpper = (rIsco*rIsco)-(2.*rIsco)+(a*sqrt(rIsco));
-double efficiencyLower = (rIsco*rIsco)-(3.*rIsco)+(2.*a*sqrt(rIsco));
-double efficiency = 1.-(efficiencyUpper/(rIsco*sqrt(efficiencyLower)));
+double efficiencyUpper; //
+double efficiencyLower; //
+double efficiency; //
 
 //Disk thickness variables
 double scaleHeightValue; //vertical height of disk above the midplane
-double heightFrontTerm = 2.*(3./(2.*efficiency))*accretion; //Calculating the front term of the scale height equation
+double heightFrontTerm; //Calculating the front term of the scale height equation //
 
 //Initial position of photons (at observer)
-double initRadius = obsRadius; //radial position of observer
-double initPhi = obsPhi; //phi position of observer
-double initTheta = inclination; //theta position of observer (should equal inclination angle, alpha)
-double initTime = 0.; //initial time
+double initRadius; //radial position of observer
+double initPhi; //phi position of observer
+double initTheta; //theta position of observer (should equal inclination angle, alpha)
+double initTime; //initial time
 
 //Cylindrical radius of photon
 double rProjected; //pseudo-cylindrical radius
@@ -51,4 +51,4 @@ double imgX,imgY,imgB; //defining x,y cartesian grid for image plane. imgX = x, 
 double dStep; //step size variable that will be refined over integration
 double rSqrtSwitch; //switch variable that determines if rdot is negative or positive
 double thSqrtSwitch; //switch variable that determines if thetadot is negative or positive
-double rLimit = rEvent + horizonStop;  //minimum radial distance (currently r_horizon + 0.01)
+double rLimit;  //minimum radial distance (currently r_horizon + 0.01) //

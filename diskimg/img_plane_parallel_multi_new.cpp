@@ -2,23 +2,14 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include "ic1_multi.h"
+#include "ic1_multi_new.h"
 #include "variable_names.h"
 #include "photon_geos_thindisk.h"
 #include "metric_kerr.h"
 #include "disk_equations_new.h"
 #include "propagate_rk4_thindisk_new.h"
 
-//This is not a working code. What it needs to do is, for each photon, write its output to a separate file for each Mdot case.
-//This implies of course that I have to open each file prior to the trace.
-//I will have to do many cases of std::ofstream myfile;
-//Can I do a std::ofstream array? Put a loop starting right before the propogate call, go until it hits the accretion disk for that iteration, advance the index by one, and then continue.
-//The index will point to another file in the std::ofstream array, which can be opened near the beginning by looping over the array.
-//I can then loop over the array again at the end to close them all.
-
-//This code needs tested, but I have been able to figure out a way to possible implement multiple file outputs.
-//It does compile!
-//Last update by Corbin Taylor at 11:28 am on 3/13/19
+//Last update by Corbin Taylor at 6:00 pm on 3/19/19
 
 //This allows me to convert an integer into a string, overcoming the version problems on galaxy (outdated icc compiler)
 #include <string>
@@ -54,14 +45,14 @@ int main(int argc, char* argv[]){
 	inclination = acos(atof(argv[5]));//15.0;
 	
 	//Accretion parameters (initAcc > finalAcc)
-	numAcc = atoi(argv[6]);
-	initAcc = atof(argv[7]);
-	finalAcc = atof(argv[8]);
+	numThickness = atoi(argv[6]);
+	initThickness = atof(argv[7]);
+	finalThickness = atof(argv[8]);
 	imgSize = atof(argv[9]);
 	outFilePrefix = argv[10];
 	
 	//Calculating the deltaAcc from the inputs
-	deltaAcc = (finalAcc - initAcc)/numAcc;
+	deltaThickness = (finalThickness - initThickness)/(numThickness-1);
 	
 	//Calculating radius of event horizon
 	rEvent = 1. + pow(1.-(a*a),0.5); //
@@ -88,7 +79,7 @@ int main(int argc, char* argv[]){
 	std::cout << "1\n";
 
 	//Initializing the array of output streams
-	std::ofstream outStreams[numAcc];
+	std::ofstream outStreams[numThickness];
 	
 	//Initializing the array of stream names
 	//const char* outNames[numAcc];
@@ -104,7 +95,7 @@ int main(int argc, char* argv[]){
 	//Opening up each of the output streams by looping over output stream array outStreams
 	//int fileIndex = 0;
 	std::string fileName;
-	while (fileIndex < numAcc){
+	while (fileIndex < numThickness){
 		fileName = outFilePrefix + "_" + patch::to_string(fileIndex) + ".txt";
 		outStreams[fileIndex].open(fileName.c_str());
 		fileIndex += 1;
@@ -122,7 +113,7 @@ int main(int argc, char* argv[]){
     int j,k; //defining looping dummy variables. j is x variable. k is y variable
     
     //Accretion rate dummy variable
-    int accIndex;
+    int thicknessIndex;
 
     j = procNum*colPerProc; //setting dummy j to 0
     while (j < (procNum+1)*colPerProc){
@@ -152,13 +143,13 @@ int main(int argc, char* argv[]){
             posVec[3] = initPhi; //horizontal angle phi
             
 			//Starting the propagation loop, where I will write to a different file for each Mdot value
-			accIndex = 0;
-			while (accIndex < numAcc){
+			thicknessIndex = 0;
+			while (thicknessIndex < numThickness){
 				//Calculating the accretion rate
-				accretion = initAcc + (accIndex*deltaAcc);
+				thickness = initThickness + (thicknessIndex*deltaThickness);
 				
 				//Calculating the scale height normalization term from the accretion rate
-				heightFrontTerm = 2.*(3./(2.*efficiency))*accretion;
+				heightFrontTerm = thickness;//2.*(3./(2.*efficiency))*accretion;
 				
 				if (posVec[1]*cos(posVec[2]) > scaleHeightFnct(posVec[1],posVec[2])){
 				
@@ -181,10 +172,10 @@ int main(int argc, char* argv[]){
             	finalEnergy = -1.*finalEnergy;
 
 				//Outputting data to 'myfile': x, y, g, final_t, final_r, final_theta, final_phi, disk_H, pseudo-cylindrical_r
-            	outStreams[accIndex] << imgX << " " << imgY << " " << (energy/finalEnergy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << "\n";
+            	outStreams[thicknessIndex] << imgX << " " << imgY << " " << (energy/finalEnergy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << "\n";
 				
 				//advancing the accretion index by 1
-				accIndex += 1;
+				thicknessIndex += 1;
 			}
             //advancing k by 1
             k++;
@@ -194,7 +185,7 @@ int main(int argc, char* argv[]){
     }
     //closing the various output files to be saved by looping over the stream array
     fileIndex = 0;
-    while (fileIndex < numAcc){
+    while (fileIndex < numThickness){
 		outStreams[fileIndex].close();
 		fileIndex += 1;
 	}
