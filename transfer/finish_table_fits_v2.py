@@ -62,7 +62,8 @@ fitsData.close()
 del fitsData
 
 #Creating placeholder angle array
-angleArray = np.zeros(20)+1.
+angleArray = np.zeros((100,20))+1.
+print(angleArray)
 
 #Creating new HDU columns for placeholder angle array
 cols = []
@@ -81,7 +82,7 @@ k = 1
 fitsData = fits.open(outFitsFile)
 
 #Loading in data from the individual i-th FITS file
-print inFitsFiles[i]
+print(inFitsFiles[i])
 data = fits.open(inFitsFiles[i])
 	
 #Defining dummy variable to loop over the tables of the FITS file
@@ -92,7 +93,7 @@ while (j <= len(a)):
 	while(k <= len(mu)):
 		#Checking to see if we've reached the end of the i-th FITS file
 		if (m == len(data)):
-			print "Switching Files!"
+			print("Switching Files!")
 			#Emptying variable to be re-used
 			del data
 			#Increasing the FITS file dummy variable by 1
@@ -101,7 +102,7 @@ while (j <= len(a)):
 			data = fits.open(inFitsFiles[i])
 			#Setting the table variable back to 1
 			m = 1
-			print inFitsFiles[i]
+			print(inFitsFiles[i])
 
 		#Getting data and columns of m-th table of i-th FITS file
 		oldTranHDU = data[m]
