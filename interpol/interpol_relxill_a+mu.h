@@ -1,3 +1,5 @@
+//This is directly copied+pasted from relbase.c. I need to alter it so that it's consistent with 3D interpolation.
+
 // interpolate the table in the A-MU0 plane (for one value of radius)
     static void interpol_a_mu0(int ii, double ifac_a, double ifac_mu0, int ind_a,
     		int ind_mu0, relSysPar* sysPar, relTable* relline_table) {
