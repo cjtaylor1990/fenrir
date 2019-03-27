@@ -9,16 +9,7 @@
 #include "disk_equations_new.h"
 #include "propagate_rk4_thindisk_new.h"
 
-//This is not a working code. What it needs to do is, for each photon, write its output to a separate file for each Mdot case.
-//This implies of course that I have to open each file prior to the trace.
-//I will have to do many cases of std::ofstream myfile;
-//Can I do a std::ofstream array? Put a loop starting right before the propogate call, go until it hits the accretion disk for that iteration, advance the index by one, and then continue.
-//The index will point to another file in the std::ofstream array, which can be opened near the beginning by looping over the array.
-//I can then loop over the array again at the end to close them all.
-
-//This code needs tested, but I have been able to figure out a way to possible implement multiple file outputs.
-//It does compile!
-//Last update by Corbin Taylor at 11:28 am on 3/13/19
+//Last update by Corbin Taylor at 11:28 am on 3/27/19
 
 //This allows me to convert an integer into a string, overcoming the version problems on galaxy (outdated icc compiler)
 #include <string>
@@ -61,7 +52,12 @@ int main(int argc, char* argv[]){
 	outFilePrefix = argv[10];
 	
 	//Calculating the deltaAcc from the inputs
-	deltaThickness = (finalThickness - initThickness)/(numThickness-1);
+	if (numThickness > 1){
+		deltaThickness = (finalThickness - initThickness)/(numThickness-1);
+	}else{
+		deltaThickness = 0.;
+	}
+		
 	
 	//Calculating radius of event horizon
 	rEvent = 1. + pow(1.-(a*a),0.5); //
@@ -69,7 +65,11 @@ int main(int argc, char* argv[]){
 	//Calculating the inner-most stable orbital radius
 	z1 = 1. + (pow(1-a*a,(1./3.))*((pow(1+a,(1./3.)))+(pow(1-a,(1./3.))))); //
 	z2 = sqrt((3.*a*a)+(z1*z1)); //
-	rIsco = 3.+z2-sqrt((3-z1)*(3+z1+(2.*z2))); //
+	if (a < 0.){
+		rIsco = 3.+z2+sqrt((3-z1)*(3+z1+(2.*z2))); //
+	}else{
+		rIsco = 3.+z2-sqrt((3-z1)*(3+z1+(2.*z2)));
+	}
 
 	//Efficiency and accretion rate (Mdot/Eddington) to calculate scale height
 	efficiencyUpper = (rIsco*rIsco)-(2.*rIsco)+(a*sqrt(rIsco)); //
@@ -85,7 +85,6 @@ int main(int argc, char* argv[]){
 	initTheta = inclination; //theta position of observer (should equal inclination angle, alpha)
 	initTime = 0.; //initial time
 	
-	std::cout << "1\n";
 
 	//Initializing the array of output streams
 	std::ofstream outStreams[numThickness];
@@ -109,8 +108,6 @@ int main(int argc, char* argv[]){
 		outStreams[fileIndex].open(fileName.c_str());
 		fileIndex += 1;
 	}
-	
-	std::cout << "2\n";
 	
 	//Setting accretion rate to the initial accretion value (initAcc)
 	//accretion = initAcc;

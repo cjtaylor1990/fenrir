@@ -10,8 +10,12 @@ import os
 def rIsco(a):
 	z1 = 1 + (((1-(a*a))**(1./3.))*(((1+a)**(1./3.))+((1-a)**(1./3.))))
 	z2 = ((3*(a*a))+(z1*z1))**0.5
-	rOut = 3+z2-(((3-z1)*(3+z1+(2.*z2)))**0.5)
+	if (a < 0.):
+		rOut = 3+z2+(((3-z1)*(3+z1+(2.*z2)))**0.5)
+	else:
+		rOut = 3+z2-(((3-z1)*(3+z1+(2.*z2)))**0.5)
 	return rOut
+
 a = float(sys.argv[1])#0.9981
 outFile = str(sys.argv[2])
 numLayers = int(sys.argv[3])
@@ -111,6 +115,7 @@ gMaxArray = np.zeros(nRadialBins)
 tranArray1 = np.zeros((nRadialBins,nEnergyBins))
 tranArray2 = np.zeros((nRadialBins,nEnergyBins))
 
+print(specRadius)
 i=0
 fileNumber = 0
 while (i < nRadialBins):
@@ -159,7 +164,8 @@ while (i < nRadialBins):
 		specEnergy = gRatio[iRcut]
 		specPhi = phi[iRcut]
 		specHeight = scaleHeight[iRcut]
-
+		
+		print(specRadius)
 	#Finding indices for photons that fall in annulus
 	iInBin = np.where(np.logical_and(specRadius >= rMinBin, specRadius < rMaxBin))
 	
@@ -173,11 +179,14 @@ while (i < nRadialBins):
 	
 	#print(gBin)	
 
-	if (len(gBin) > 0):
+	if (len(gBin) > 1):
 		#Calculating g_min, g_max
+		print(len(gBin))
+		print(rMinBin)
 		gMin = np.min(gBin)
 		gMax = np.max(gBin)
 		gStar = (gBin - gMin)/(gMax - gMin)
+		#print(len(gBin))
 
 		#print(np.where(np.isnan(gBin) == True))
 		print(rBin[np.where(np.isnan(gBin) == True)])
@@ -232,10 +241,13 @@ while (i < nRadialBins):
 		#transferBack = (totFluxBack[0]/(rBin*delR))*((gMax-gMin)/(gMids**3.))*np.sqrt(gStarMidArray*(1.-gStarMidArray))
 		#transferFront = (totFluxFront[0]/(rBin*delR))*((gMax-gMin)/(gMids**3.))*np.sqrt(gStarMidArray*(1.-gStarMidArray))
 	else:
-		transferBack = np.zeros(len(gStarLimArray))
-		transferFront = np.zeros(len(gStarLimArray))
+		transferBack = np.zeros(nEnergyBins)
+		transferFront = np.zeros(nEnergyBins)
 		gMin = 0.
 		gMax = 0.
+		print('Empty Bin')
+		print(rMinBin)
+		print(rMaxBin)
 	
 		#Normalizing the transfer functions
 		norm = 1.#np.sum(transferBack)+np.sum(transferFront)
