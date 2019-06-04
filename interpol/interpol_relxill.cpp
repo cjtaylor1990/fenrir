@@ -5,7 +5,7 @@
 #include "interpol_relxill.h"
 
 double test_func(double a1, double a2, double a3){
-	return a1 + 2.*a2 + 5.*a3;
+	return 0.5*a1 + 0.8*a2 + 0.1*a3;
 }
 
 int main(void){
@@ -18,15 +18,15 @@ int main(void){
 	double interpolPos[3];
 	
 	xSample[0] = 0.;
-	xSample[1] = 1.;
+	xSample[1] = 10.;
 	ySample[0] = 0.;
-	ySample[1] = 1.;
+	ySample[1] = 10.;
 	zSample[0] = 0.;
-	zSample[1] = 1.;
+	zSample[1] = 10.;
 	
-	interpolPos[0] = 0.5;
-	interpolPos[1] = 0.5;
-	interpolPos[2] = 0.5;
+	interpolPos[0] = 4.;
+	interpolPos[1] = 8.;
+	interpolPos[2] = 5.;
 	
 	//Evaluating the function at sample points
 	double r111,r211,r121,r221,r112,r212,r122,r222;
@@ -51,6 +51,17 @@ int main(void){
 	std::cout << "Interpolated Result: " << interpol << "\n";
 	std::cout << "Exact Result: " << exact << "\n";
 	std::cout << "Relative Error: " << ((interpol-exact)/exact)*100. << " % \n";
+	std::cout << "ifrac1: " << ifrac1 << "\n";
+	std::cout << "ifrac2: " << ifrac2 << "\n";
+	std::cout << "ifrac3: " << ifrac3 << "\n";
+	std::cout << "r111: " << r111 << "\n";
+	std::cout << "r211: " << r211 << "\n";
+	std::cout << "r121: " << r121 << "\n";
+	std::cout << "r112: " << r112 << "\n";
+	std::cout << "r221: " << r221 << "\n";
+	std::cout << "r122: " << r122 << "\n";
+	std::cout << "r212: " << r212 << "\n";
+	std::cout << "r222: " << r222 << "\n";
 	
 	return 0;
 	
