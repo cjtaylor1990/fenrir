@@ -6,9 +6,19 @@ import csv
 import sys
 
 def rIsco(a):
+	"""Calculates the inner-most stable circular orbit (or rIsco, in gravitational
+	radii Rg) for a given dimensionless spin value. |a| <= 1
+
+	Example: rIsco(0) => 6.0 """
 	z1 = 1 + (((1-(a*a))**(1./3.))*(((1+a)**(1./3.))+((1-a)**(1./3.))))
 	z2 = ((3*(a*a))+(z1*z1))**0.5
-	rOut = 3+z2-(((3-z1)*(3+z1+(2.*z2)))**0.5)
+	if (a < 0) and (a >= -1):
+		rOut = 3+z2+(((3-z1)*(3+z1+(2.*z2)))**0.5)
+	elif (a >= 0) and (a <= 1):
+		rOut = 3+z2-(((3-z1)*(3+z1+(2.*z2)))**0.5)
+	else:
+		print("ERROR: Spin parameter must be within range of -1 to 1, inclusive.")
+		sys.exit()
 	return rOut
 
 def grSigma(r,a,theta):
@@ -51,13 +61,13 @@ scaleHeight = data[7]
 projectedRadius = data[8]
 gamma = data[9]
 diskHitSwitch = data[10]
-print np.min(x)/np.pi
-print np.max(x)/np.pi
+#print np.min(x)/np.pi
+#print np.max(x)/np.pi
 a = float(sys.argv[4])#0.998
 hCorona = float(sys.argv[5])
 rIn = rIsco(a)
 rOut = 500.
-print rIsco(a)
+#print rIsco(a)
 
 #iRcut = np.where(np.logical_and(projectedRadius > rIn,projectedRadius < rOut, diskHitSwitch > 0.5))
 iRcut = np.where(np.logical_and((np.logical_and(np.logical_and(projectedRadius[:-1] > rIn,projectedRadius[:-1] < rOut), diskHitSwitch[:-1] > 0)),(gRatio[:-1] < 100.)))
