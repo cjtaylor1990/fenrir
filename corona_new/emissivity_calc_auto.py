@@ -33,10 +33,11 @@ def grArea(r,theta,dr,a,dtheta):
 	areaOut = (2.*np.pi)*phiTerm*rTerm*dr
 	return areaOut
 
-inFile = './test_cos.npy'#str(sys.argv[1])
-outFile = './test_hist.npy'#str(sys.argv[2])
-nBins = 150#int(sys.argv[3]) #1000
-specIndex = 2.#float(sys.argv[5]) #2
+#Input argv: inFile, outFile, nBins, spin(a), corona_height(hCorona)
+inFile = sys.argv[1]#'./test_even.npy'
+outFile = sys.argv[2]#'./test_hist.npy'
+nBins = int(sys.argv[3])#150
+specIndex = 2.
 #Unpacking data (x, y, gRatio, time, radius, theta, phi)
 data = np.load(inFile)
 x = data[0]
@@ -52,33 +53,20 @@ gamma = data[9]
 diskHitSwitch = data[10]
 print np.min(x)/np.pi
 print np.max(x)/np.pi
-a = 0.998
+a = float(sys.argv[4])#0.998
+hCorona = float(sys.argv[5])
 rIn = rIsco(a)
-rOut = 100.#29.253597#float(sys.argv[4]) #100
+rOut = 500.
 print rIsco(a)
 
 #iRcut = np.where(np.logical_and(projectedRadius > rIn,projectedRadius < rOut, diskHitSwitch > 0.5))
-iRcut = np.where(np.logical_and((np.logical_and(np.logical_and(projectedRadius > rIn,projectedRadius < rOut), diskHitSwitch > 0)),(gRatio < 100.)))
+iRcut = np.where(np.logical_and((np.logical_and(np.logical_and(projectedRadius[:-1] > rIn,projectedRadius[:-1] < rOut), diskHitSwitch[:-1] > 0)),(gRatio[:-1] < 100.)))
 
-"""
-#cs = pl.contour(xPlot ,yPlot , rPlot, 20, colors = 'k')
-pl.scatter(y[iRcut]/np.pi, x[iRcut]/np.pi, c = (projectedRadius)[iRcut], cmap = pl.cm.coolwarm_r, lw=0, edgecolor = 'none')
-#pl.clabel(cs, inline = 1, fontsize = 10)
-pl.xlabel(r'$\beta$', fontsize = 20)
-pl.ylabel(r'$\alpha$', fontsize = 20)
-pl.xlim([0.,2.])
-pl.ylim([1.,0.])
-#pl.text(80., 0.5, r'E$_{\rm obs}$ / E$_{\rm em}$', rotation = 270, fontsize = 20)
-#pl.axhline(0., color = '0.7', linestyle = '--', linewidth = 3.)
-pl.colorbar()
-pl.show()
-"""
-
-specEnergy = (gRatio[iRcut])#[weirdCut])#[np.isfinite(gRatio[iRcut])]
-specRadius = (projectedRadius[iRcut])#[weirdCut]#[np.isfinite(gRatio[iRcut])]
-specTheta = (theta[iRcut])#[weirdCut]
-specPhi = (phi[iRcut])#[weirdCut]
-specGamma = (gamma[iRcut])#[weirdCut]
+specEnergy = (gRatio)[iRcut]#[weirdCut])#[np.isfinite(gRatio[iRcut])]
+specRadius = (projectedRadius)[iRcut]#[weirdCut]#[np.isfinite(gRatio[iRcut])]
+specTheta = (theta)[iRcut]#[weirdCut]
+specPhi = (phi)[iRcut]#[weirdCut]
+specGamma = (gamma)[iRcut]#[weirdCut]
 specDelta = np.pi - x[iRcut]
 
 binLimArray = np.logspace(np.log10(rIn),np.log10(rOut),nBins,endpoint=False)
@@ -88,6 +76,8 @@ drArray = np.zeros(nBins-1)
 dThetaArray = np.zeros(nBins-1)
 numArray = np.zeros(nBins-1)
 fluxArray = np.zeros(nBins-1)
+dDelta = np.zeros(nBins-1)
+binDelta = np.zeros(nBins-1)
 
 l = 1
 #print specHist[1]
@@ -107,23 +97,16 @@ while (l < nBins):
 	if (numArray[l-1] > 0):
 		#drArray[l-1] = np.max(radInBin)-np.min(radInBin)
 		dThetaArray[l-1] = np.max(thetaInBin)-np.min(thetaInBin)
+		dDelta[l-1] = np.max(deltaInBin) - np.min(deltaInBin)
+		binDelta[l-1] = np.mean(deltaInBin)
 		grAreaInBin = grArea(radInBin,thetaInBin,drArray[l-1],a,dThetaArray[l-1])
-		fluxInBin = (1./(gammaInBin*grAreaInBin))*(energyInBin**(specIndex))#*np.sin(deltaInBin)
+		fluxInBin = (1./(gammaInBin*grAreaInBin))*np.sin(deltaInBin)*(energyInBin**(specIndex))#*np.sin(deltaInBin)
 		fluxArray[l-1] = np.sum(fluxInBin)*drArray[l-1]
 	else:
 		fluxInBin = 0.
 		fluxArray[l-1] = 0.
+		binDelta[l-1] = 0.
 	l+=1
 
-#pl.figure(figsize=(10.,10.))
-pl.plot(specBin,fluxArray/np.sum(fluxArray), color = 'k')
-pl.axvline(rIn, color = 'g')
-pl.xlabel('r')
-pl.ylabel('F')
-pl.yscale('log')
-pl.xscale('log')
-pl.xlim([1.,100.])
-pl.ylim([10.**-4.,10**-1.])
-#outArray = np.array([[specBin,fluxArray,numArray],binLimArray])
-#np.save(outFile, outArray)
-pl.show()
+outArray = np.array([[specBin,fluxArray,binDelta],a,hCorona])
+np.save(outFile, outArray)
