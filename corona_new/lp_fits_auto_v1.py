@@ -50,13 +50,28 @@ for file in emissivityFileArray:
 
 	#If the file doesn't exist
 	if not existBool:
-		radiusColumn = fits.Column(name = 'r', format = '150E', unit = 'GM/c^2', array = [radius,radius])
-		fluxColumn = fits.Column(name = 'h1', format = '150E', unit = 'GM/c^2', array = [flux,flux])
-		deltaColumn = fits.Column(name = 'del1', format = '150E', unit = 'deg', array = [delta,delta])
+		fluxArray = flux
+		deltaArray = delta
+		radiusColumn = fits.Column(name = 'r', format = '1E', unit = 'GM/c^2', array = radius)
+		fluxColumn = fits.Column(name = 'h1', format = '1E', unit = 'GM/c^2', array = fluxArray)
+		deltaColumn = fits.Column(name = 'del1', format = '1E', unit = 'deg', array = deltaArray)
 		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn])
+		hdu = fits.BinTableHDU.from_columns(cols)
+		hdu.writeto(outFile)
 	else:
-		pass #For now, I'm not going to deal with appending to an existing
+		fitsData = fits.open(outFile)[1].data
+		print(fitsData[0][1])
+		fluxArray = [fitsData[i][1] for i in range(len(fitsData))].append(np.array(radius,dtype='float32'))
+		deltaArray = [fitsData[i][2] for i in range(len(fitsData))].append(np.array(delta,dtype='float32'))
+		radiusColumn = fits.Column(name = 'r', format = '2E', unit = 'GM/c^2', array = fitsData[0])
+		fluxColumn = fits.Column(name = 'h1', format = '2E', unit = 'GM/c^2', array = fluxArray)
+		deltaColumn = fits.Column(name = 'del1', format = '2E', unit = 'deg', array = deltaArray)
+		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn])
+		hdu = fits.BinTableHDU.from_columns(cols)
+		hdu.writeto(outFile,overwrite=True)
 
+
+	"""
 	#Creating HDUTable
 	hdu = fits.BinTableHDU.from_columns(cols)
 
@@ -76,3 +91,4 @@ for file in emissivityFileArray:
 	else:
 		#Saving FITS file
 		hdu.writeto(outFile)
+	"""
