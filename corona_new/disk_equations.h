@@ -1,13 +1,24 @@
 #include <cmath>
 
 //Function to calculate the disk scale height
-double scaleHeightTheta(double radius, double theta){
+//double scaleHeightTheta(double radius, double theta){
+//  double scaleHTprojR = radius*std::sin(theta);
+//  if (scaleHTprojR < rIsco){
+//    return M_PI/2.;
+//  }
+//  else{
+//    return std::acos((heightFrontTerm*(1 - sqrt(rIsco/scaleHTprojR)))/radius);
+//  }
+//}
+
+//Function to calculate the disk scale height theta
+double scaleHeightFnct(double radius, double theta){
   double scaleHTprojR = radius*std::sin(theta);
   if (scaleHTprojR < rIsco){
-    return M_PI/2.;
+    return 0.;
   }
   else{
-    return std::acos((heightFrontTerm*(1 - sqrt(rIsco/scaleHTprojR)))/radius);
+    return heightFrontTerm*(1 - sqrt(rIsco/scaleHTprojR));
   }
 }
 
@@ -47,7 +58,7 @@ void diskVelocity(double posVec[4], double diskVelVec[4], double scaleHeightValu
     diskVelVec[3] = diskPhiDot(posVec[1],posVec[3],posVec[2],posVec[0],scaleHeightValue,rProjected); //phi
     }
 
-//LNRF basis components to calculate the Lorentz factor of the disk element in the frame of the LNRF at the same instantaneous position    
+//LNRF basis components to calculate the Lorentz factor of the disk element in the frame of the LNRF at the same instantaneous position
 double eNu(double r, double phi, double theta, double time){
 	double eNuOut = (sigma(r,phi,theta,time)*delta(r,phi,theta,time))/aFunct(r,phi,theta,time);
 	eNuOut = sqrt(eNuOut);
@@ -85,5 +96,3 @@ double findLorentz(double posVec[4], double diskVelVec[4]){
     lorentzVelSq = ((lorentzVelVec[1]*lorentzVelVec[1]) + (lorentzVelVec[2]*lorentzVelVec[2]) + (lorentzVelVec[3]*lorentzVelVec[3]))/(lorentzVelVec[0]*lorentzVelVec[0]);
     return 1./sqrt(1.-lorentzVelSq);
 }
-    
-	  

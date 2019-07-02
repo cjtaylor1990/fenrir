@@ -33,8 +33,8 @@ def grArea(r,theta,dr,a,dtheta):
 	areaOut = (2.*np.pi)*phiTerm*rTerm*dr
 	return areaOut
 
-inFile = './test_even.npy'
-outFile = './test_hist.npy'
+inFile = 'test_new_v2_th4.npy'#'test_even.npy'#'./test_new_v2_4_0.npy'
+outFile = 'test_new_v2_th4_hist.npy'#'test_even_hist.npy'#'./test_hist_4_0.npy'
 nBins = 150
 specIndex = 2.
 #Unpacking data (x, y, gRatio, time, radius, theta, phi)
