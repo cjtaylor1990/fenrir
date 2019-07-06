@@ -79,23 +79,27 @@ specPhi = (phi)[iRcut]#[weirdCut]
 specGamma = (gamma)[iRcut]#[weirdCut]
 specDelta = np.pi - x[iRcut]
 
-binLimArray = np.logspace(np.log10(rIn),np.log10(rOut),nBins,endpoint=False)
+#binLimArray = np.logspace(np.log10(rIn),np.log10(rOut),nBins,endpoint=False)
+logBinWidth = (np.log10(rOut) - np.log10(rIn))/(nBins-1)
+binLimArray = [np.log10(rIn) + logBinWidth*i for i in range(nBins)]
+binLimArray.append(np.log10(rOut)+logBinWidth)
+binLimArray = 10.**(np.array(binLimArray))
 #binLimArray = np.linspace(rIn,rOut,nBins,endpoint=False)
-specBin = np.zeros(nBins-1)
-drArray = np.zeros(nBins-1)
-dThetaArray = np.zeros(nBins-1)
-numArray = np.zeros(nBins-1)
-fluxArray = np.zeros(nBins-1)
-dDelta = np.zeros(nBins-1)
-binDelta = np.zeros(nBins-1)
+specBin = np.zeros(nBins)
+drArray = np.zeros(nBins)
+dThetaArray = np.zeros(nBins)
+numArray = np.zeros(nBins)
+fluxArray = np.zeros(nBins)
+dDelta = np.zeros(nBins)
+binDelta = np.zeros(nBins)
 
-l = 1
+l = 0
 #print specHist[1]
 while (l < nBins):
-	rMinBin = binLimArray[l-1]
-	rMaxBin = binLimArray[l]
-	specBin[l-1] = (rMinBin+rMaxBin)/2.
-	drArray[l-1] = rMaxBin-rMinBin
+	rMinBin = binLimArray[l]
+	rMaxBin = binLimArray[l+1]
+	specBin[l] = (rMinBin+rMaxBin)/2.
+	drArray[l] = rMaxBin-rMinBin
 	iInBin = np.where(np.logical_and(specRadius > rMinBin, specRadius < rMaxBin))
 	radInBin = specRadius[iInBin]
 	#drArray[l-1] = np.max(radInBin)-np.min(radInBin)
@@ -103,20 +107,20 @@ while (l < nBins):
 	gammaInBin = specGamma[iInBin]
 	energyInBin = specEnergy[iInBin]
 	deltaInBin = specDelta[iInBin]
-	numArray[l-1] = len(radInBin)
-	if (numArray[l-1] > 0):
+	numArray[l] = len(radInBin)
+	if (numArray[l] > 0):
 		#drArray[l-1] = np.max(radInBin)-np.min(radInBin)
-		dThetaArray[l-1] = np.max(thetaInBin)-np.min(thetaInBin)
-		dDelta[l-1] = np.max(deltaInBin) - np.min(deltaInBin)
-		binDelta[l-1] = np.mean(deltaInBin)
-		grAreaInBin = grArea(radInBin,thetaInBin,drArray[l-1],a,dThetaArray[l-1])
-		fluxInBin = (1./(gammaInBin*grAreaInBin))*np.sin(deltaInBin)*(energyInBin**(specIndex))#*np.sin(deltaInBin)
-		fluxArray[l-1] = np.sum(fluxInBin)*drArray[l-1]
+		dThetaArray[l] = np.max(thetaInBin)-np.min(thetaInBin)
+		dDelta[l] = np.max(deltaInBin) - np.min(deltaInBin)
+		binDelta[l] = np.mean(deltaInBin)
+		grAreaInBin = grArea(radInBin,thetaInBin,drArray[l],a,dThetaArray[l])
+		fluxInBin = (1./(gammaInBin*grAreaInBin))*np.sin(deltaInBin)#*(energyInBin**(specIndex))#*np.sin(deltaInBin)
+		fluxArray[l] = np.sum(fluxInBin)*drArray[l]
 	else:
 		fluxInBin = 0.
-		fluxArray[l-1] = 0.
-		binDelta[l-1] = 0.
+		fluxArray[l] = 0.
+		binDelta[l] = 0.
 	l+=1
 
-outArray = np.array([[specBin,fluxArray,binDelta],a,hCorona])
+outArray = np.array([[binLimArray[:-1],fluxArray,binDelta],a,hCorona])
 np.save(outFile, outArray)

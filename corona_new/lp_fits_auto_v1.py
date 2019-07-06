@@ -26,52 +26,177 @@ def rIsco(a):
 #Reading input parameters from command line: spin, corona_height, output_file, number_of_layers, file1, file2, ...
 a = float(sys.argv[1]) #Spin of black hole (dimensionless)
 hCorona = float(sys.argv[2]) #Height of corona along polar axis (r_g)
-outFile = str(sys.argv[3]) #Output FITS files
-numLayers = int(sys.argv[4]) #Number of .npy input files (one for each image size)
+numThickness = int(sys.argv[3]) #Number for thicknesses used
+filePath = str(sys.argv[4]) #File path to use for input and output files
+inputFilePrefix = str(sys.argv[5]) #Prefix of input .npy files
+outFile = str(sys.argv[6]) #Output FITS file
 
-#Array of emissivity .npy files that are given by command line
-emissivityFileArray = np.array([str(file) for file in sys.argv[5:]])
+#Auto-generating list of input files based on prefix and number of thicknesses
+inputFileList = ["{}{}{}.npy".format(filePath,inputFilePrefix,i) for i in range(numThickness)]
 
-#Checking to make sure emissivityFileArray has length = number_of_layer
-if len(emissivityFileArray) != numLayers:
-	print("ERROR: You must have same number of layers as input file. Exiting program...")
-	sys.exit()
+#Number of radial bins (relevant for FITS formating)
+nRadBins = 150
 
 #Checking to see if file already exists
 existBool = os.path.isfile(outFile)
 
-#Looping over array of emissivity .npy files
-for file in emissivityFileArray:
+#If the file doesn't exist
+if not existBool:
+	for i in range(len(inputFileList)):
+		if i != 0:
+			fitsData = fits.open(outFile)
+		currentFile = inputFileList[i]
+		emData = np.load(currentFile)
+		radius = emData[0][0] #Extracting radii values
+		flux = emData[0][1] #Extracting flux v. radii
+		delta = emData[0][2] #Extracting mean(delta) v. radii
+		deltaInc = np.zeros(nRadBins)
+		radiusColumn = fits.Column(name = 'r', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [radius])
+		fluxColumn = fits.Column(name = 'h1', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [flux])
+		deltaColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = [delta])
+		deltaIncColumn = fits.Column(name = 'del_inc1', format = '{}E'.format(nRadBins), unit = 'deg', array = [deltaInc])
+		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn,deltaIncColumn])
+		hdu = fits.BinTableHDU.from_columns(cols)
+
+		if i != 0:
+			fitsData.append(hdu)
+			fitsData.writeto(outFile,overwrite=True)
+		else:
+			hdu.writeto(outFile)
+
+
+		del hdu
+
+"""
+	fitsData = fits.open(outFile)
+
+	for file in inputFileList[1:]:
+		currentFile = inputFileList[0]
+		emData = np.load(currentFile)
+		radius = emData[0][0] #Extracting radii values
+		flux = emData[0][1] #Extracting flux v. radii
+		delta = emData[0][2] #Extracting mean(delta) v. radii
+		deltaInc = np.zeros(nRadBins)
+		radiusColumn = fits.Column(name = 'r', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [radius])
+		fluxColumn = fits.Column(name = 'h1', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [flux])
+		deltaColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = [deltaColumn])
+		deltaIncColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = [deltaIncColumn])
+		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn,deltaIncColumn])
+		fitsData.append(fits.BinTableHDU.from_columns(cols))
+
+	fitsData.writeto(outFile,overwrite=True)
+"""
+"""
+else:
+	fitsData = fits.open(outFile)
+	for i in range(1,len(inputFiles)+1):
+		currentHDU = fitsData[i].data
+		aArray = [currentHDU[j][0] for j in range(len(currentHDU))]#.append(np.array(a,dtype='float32'))
+		bArray = [currentHDU[j][1] for j in range(len(currentHDU))]#.append(np.array(b,dtype='float32'))
+		cArray = [currentHDU[j][2] for j in range(len(currentHDU))]#.append(np.array(c,dtype='float32'))
+		aArray.append(np.array(b,dtype='float32'))
+		bArray.append(np.array(c,dtype='float32'))
+		cArray.append(np.array(a,dtype='float32'))
+		col1 = fits.Column(name = 'a', format = '100E', unit = 'n/a', array = aArray)
+		col2 = fits.Column(name = 'b', format = '100E', unit = 'n/a', array = bArray)
+		col3 = fits.Column(name = 'c', format = '100E', unit = 'n/a', array = cArray)
+		cols = fits.ColDefs([col1,col2,col3])
+		currentHDU = fits.BinTableHDU.from_columns(cols)
+		fitsData[i] = currentHDU
+	fitsData.writeto(outFile,overwrite=True)
+
+#Loading in data from .npy input file
+data = np.load(inputFile) #Loading in file
+emissivityData = data[0] #Extracting emissivity data
+radius = emissivityData[0] #Extracting radii values
+flux = emissivityData[1] #Extracting flux v. radii
+delta = emissivityData[2] #Extracting mean(delta) v. radii
+
+#If the file doesn't exist
+if not existBool:
+	radiusColumn = fits.Column(name = 'r', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = radius)
+	fluxColumn = fits.Column(name = 'h1', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [flux])
+	deltaColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = [flux])
+	cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn])
+	hdu = fits.BinTableHDU.from_columns(cols)
+	hdu.writeto(outFile)
+else:
+	fitsData = fits.open(outFile)
+	if thicknessIndex+1 not in range(len(fitsData)):
+		radiusColumn = fits.Column(name = 'r', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = radius)
+		fluxColumn = fits.Column(name = 'h1', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [flux])
+		deltaColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = [flux])
+		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn])
+		hdu = fits.BinTableHDU.from_columns(cols)
+		fitsData.append(hdu)
+		fitsData.writeto(outFile,overwrite=True)
+
+	else:
+		currentHDU = fitsData[thicknessIndex+1].data
+		radiusArray = [currentHDU[j][0] for j in range(len(currentHDU))]#.append(np.array(a,dtype='float32'))
+		fluxArray = [currentHDU[j][1] for j in range(len(currentHDU))]#.append(np.array(b,dtype='float32'))
+		deltaArray = [currentHDU[j][2] for j in range(len(currentHDU))]#.append(np.array(c,dtype='float32'))
+		radiusArray.append(np.array(radius,dtype='float32'))
+		fluxArray.append(np.array(flux,dtype='float32'))
+		deltaArray.append(np.array(delta,dtype='float32'))
+		radiusColumn = fits.Column(name = 'r', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = radiusArray)
+		fluxColumn = fits.Column(name = 'h1', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = fluxArray)
+		deltaColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = deltaArray)
+		cols = fits.ColDefs([col1,col2,col3])
+		currentHDU = fits.BinTableHDU.from_columns(cols)
+		fitsData[thicknessIndex+1] = currentHDU
+		fitsData.writeto(outFile,overwrite=True)
+"""
+"""
+#If the file doesn't exist
+if not existBool:
 	data = np.load(file) #Loading in file
 	emissivityData = data[0] #Extracting emissivity data
 	radius = emissivityData[0] #Extracting radii values
 	flux = emissivityData[1] #Extracting flux v. radii
 	delta = emissivityData[2] #Extracting mean(delta) v. radii
+	col1 = fits.Column(name = 'a', format = '100E', unit = 'n/a', array = aArray)
+	col2 = fits.Column(name = 'h1', format = '150E', unit = 'GM/c^2', array = fluxArray)
+	col3 = fits.Column(name = 'c', format = '100E', unit = 'n/a', array = cArray)
+	cols = fits.ColDefs([col1,col2,col3])
+	hdu = fits.BinTableHDU.from_columns(cols)
+	hdu.writeto(outFile)
+	del hdu
 
-	#If the file doesn't exist
-	if not existBool:
-		fluxArray = flux
-		deltaArray = delta
-		radiusColumn = fits.Column(name = 'r', format = '1E', unit = 'GM/c^2', array = radius)
-		fluxColumn = fits.Column(name = 'h1', format = '1E', unit = 'GM/c^2', array = fluxArray)
-		deltaColumn = fits.Column(name = 'del1', format = '1E', unit = 'deg', array = deltaArray)
-		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn])
-		hdu = fits.BinTableHDU.from_columns(cols)
-		hdu.writeto(outFile)
-	else:
-		fitsData = fits.open(outFile)[1].data
-		print(fitsData[0][1])
-		fluxArray = [fitsData[i][1] for i in range(len(fitsData))].append(np.array(radius,dtype='float32'))
-		deltaArray = [fitsData[i][2] for i in range(len(fitsData))].append(np.array(delta,dtype='float32'))
-		radiusColumn = fits.Column(name = 'r', format = '2E', unit = 'GM/c^2', array = fitsData[0])
-		fluxColumn = fits.Column(name = 'h1', format = '2E', unit = 'GM/c^2', array = fluxArray)
-		deltaColumn = fits.Column(name = 'del1', format = '2E', unit = 'deg', array = deltaArray)
-		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn])
-		hdu = fits.BinTableHDU.from_columns(cols)
-		hdu.writeto(outFile,overwrite=True)
+	fitsData = fits.open(outFile)
+
+	for file in inputFiles[1:]:
+		aArray = [a]
+		bArray = [b]
+		cArray = [c]
+		col1 = fits.Column(name = 'a', format = '100E', unit = 'n/a', array = aArray)
+		col2 = fits.Column(name = 'b', format = '100E', unit = 'n/a', array = bArray)
+		col3 = fits.Column(name = 'c', format = '100E', unit = 'n/a', array = cArray)
+		cols = fits.ColDefs([col1,col2,col3])
+		fitsData.append(fits.BinTableHDU.from_columns(cols))
+
+	fitsData.writeto(outFile,overwrite=True)
+
+else:
+	fitsData = fits.open(outFile)
+	for i in range(1,len(inputFiles)+1):
+		currentHDU = fitsData[i].data
+		aArray = [currentHDU[j][0] for j in range(len(currentHDU))]#.append(np.array(a,dtype='float32'))
+		bArray = [currentHDU[j][1] for j in range(len(currentHDU))]#.append(np.array(b,dtype='float32'))
+		cArray = [currentHDU[j][2] for j in range(len(currentHDU))]#.append(np.array(c,dtype='float32'))
+		aArray.append(np.array(b,dtype='float32'))
+		bArray.append(np.array(c,dtype='float32'))
+		cArray.append(np.array(a,dtype='float32'))
+		col1 = fits.Column(name = 'a', format = '100E', unit = 'n/a', array = aArray)
+		col2 = fits.Column(name = 'b', format = '100E', unit = 'n/a', array = bArray)
+		col3 = fits.Column(name = 'c', format = '100E', unit = 'n/a', array = cArray)
+		cols = fits.ColDefs([col1,col2,col3])
+		currentHDU = fits.BinTableHDU.from_columns(cols)
+		fitsData[i] = currentHDU
+	fitsData.writeto(outFile,overwrite=True)
 
 
-	"""
+
 	#Creating HDUTable
 	hdu = fits.BinTableHDU.from_columns(cols)
 
@@ -91,4 +216,4 @@ for file in emissivityFileArray:
 	else:
 		#Saving FITS file
 		hdu.writeto(outFile)
-	"""
+"""
