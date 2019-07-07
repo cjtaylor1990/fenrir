@@ -4,34 +4,36 @@ import sys
 import os
 
 #Input file information
-inputPrefix = str(sys.argv[1])
-numberHeights = int(sys.argv[2])
-numberThickness = int(sys.argv[3])
-inputFiles = [inputPrefix + '_' + str(i) + '.fits' for i in range(numberHeights)]
+filePath = str(sys.argv[1])
+inputPrefix = str(sys.argv[2])
+numberHeights = int(sys.argv[3])
+numberThickness = int(sys.argv[4])
+inputFiles = [filePath + inputPrefix + str(i) + '.fits' for i in range(1,numberHeights+1)]
 
 #Reading input parameters from command line
-outFile = str(sys.argv[4]) #Output FITS files
+outFile = filePath + str(sys.argv[5]) #Output FITS files
 
 for i in range(1,numberThickness+1):
-	aList = []
-	bList = []
-	cList = []
+	fluxColumnList = []
+	delColumnList = []
+	delIncColumnList = []
 	for file in inputFiles:
-		#print(file)
 		currentHDU = fits.open(file)
-		#print(currentHDU)
 		currentHDU = currentHDU[i].data
-		aArray = [[row[0] for row in currentHDU]]
-		bArray = [[row[1] for row in currentHDU]]
-		cArray = [[row[2] for row in currentHDU]]
-		aList += aArray
-		bList += bArray
-		cList += cArray
-	print(aList[0])
-	aColumnList = [fits.Column(name='a{}'.format(k+1),format='100E', unit = 'n/a', array = aList[k]) for k in range(numberHeights)]
-	bColumnList = [fits.Column(name='b{}'.format(k+1),format='100E', unit = 'n/a', array = bList[k]) for k in range(numberHeights)]
-	cColumnList = [fits.Column(name='c{}'.format(k+1),format='100E', unit = 'n/a', array = cList[k]) for k in range(numberHeights)]
-	cols = fits.ColDefs(aColumnList + bColumnList + cColumnList) #appending the column lists together
+		#radColumn = [row[0] for row in currentHDU]
+		fluxColumn = [[row[1] for row in currentHDU]]
+		delColumn = [[row[2] for row in currentHDU]]
+		delIncColumn = [[row[3] for row in currentHDU]]
+		fluxColumnList += fluxColumn
+		delColumnList += delColumn
+		delIncColumnList += delIncColumn
+
+	#print(len(radColumn),len(radColumn[0]))
+	combinedRadius = [fits.Column(name='r',format='150E',unit='GM/c^2', array = [row[0] for row in currentHDU])]
+	combinedFlux = [fits.Column(name='h{}'.format(k+1),format='150E', unit = 'GM/c^2', array = fluxColumnList[k]) for k in range(numberHeights)]
+	combinedDel = [fits.Column(name='del{}'.format(k+1),format='150E', unit = 'deg', array = delColumnList[k]) for k in range(numberHeights)]
+	combinedDelInc = [fits.Column(name='del_inc{}'.format(k+1),format='150E', unit = 'deg', array = delIncColumnList[k]) for k in range(numberHeights)]
+	cols = fits.ColDefs(combinedRadius + combinedFlux + combinedDel + combinedDelInc) #appending the column lists together
 	hdu = fits.BinTableHDU.from_columns(cols)
 
 	if i == 1:
