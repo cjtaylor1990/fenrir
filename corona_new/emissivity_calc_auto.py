@@ -44,9 +44,19 @@ def grArea(r,theta,dr,a,dtheta):
 	return areaOut
 
 #Input argv: inFile, outFile, nBins, spin(a), corona_height(hCorona)
-inFile = sys.argv[1]#'./test_even.npy'
-outFile = sys.argv[2]#'./test_hist.npy'
-nBins = int(sys.argv[3])#150
+print(sys.argv[1:])
+filePath = sys.argv[1]
+inFilePrefix = sys.argv[2]
+outFilePrefix = sys.argv[3]
+thicknessIndex = int(sys.argv[4])
+
+a = float(sys.argv[5])#0.998
+hCorona = float(sys.argv[6])
+nBins = int(sys.argv[7])#150
+
+inFile = filePath + inFilePrefix + str(thicknessIndex) + '.npy'#'./test_even.npy'
+outFile = filePath + outFilePrefix + str(thicknessIndex) + '.npy'#'./test_hist.npy'
+#nBins = int(sys.argv[3])#150
 specIndex = 2.
 #Unpacking data (x, y, gRatio, time, radius, theta, phi)
 data = np.load(inFile)
@@ -63,8 +73,7 @@ gamma = data[9]
 diskHitSwitch = data[10]
 #print np.min(x)/np.pi
 #print np.max(x)/np.pi
-a = float(sys.argv[4])#0.998
-hCorona = float(sys.argv[5])
+
 rIn = rIsco(a)
 rOut = 500.
 #print rIsco(a)

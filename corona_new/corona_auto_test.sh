@@ -10,6 +10,8 @@ initThickness=20.0
 finalThickness=0.0
 numThickness=25
 
+numRadBins=150
+
 while INF=' ' read -ra line
 do
 	spin_val=${line[0]}
@@ -60,6 +62,25 @@ do
 
     rm -f ${output_path}/${machine_name}_corona_test_cat*.txt
 
-    
+	dummy_j=0
+	while [ $dummy_j -lt $numThickness ]
+	do
+		dummy_k=0
+		pids=()
+		while [ $dummy_k -lt $num_threads ] && [ $dummy_j -lt $numThickness ]
+		do
+			python emissivity_calc_auto.py ${output_path}/ ${machine_name}_corona_test_cat ${machine_name}_corona_test_hist ${dummy_j} ${spin_val} ${height_val} ${numRadBins} &
+			pids+=($!)
+			dummy_k=$((dummy_k+1))
+			dummy_j=$((dummy_j+1))
+		done
+		wait ${pids[*]}
+	done
+
+	rm -f ${output_path}/${machine_name}_corona_test_cat*.npy
+
+	python lp_fits_auto_v1.py ${spin_val} ${height_val} ${numThickness} ${output_path}/ tyr_corona_test_hist test_
+
+	rm -f ${output_path}/${machine_name}_corona_test_hist*.npy
 
 done < $param_file

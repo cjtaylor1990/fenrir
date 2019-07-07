@@ -29,10 +29,15 @@ hCorona = float(sys.argv[2]) #Height of corona along polar axis (r_g)
 numThickness = int(sys.argv[3]) #Number for thicknesses used
 filePath = str(sys.argv[4]) #File path to use for input and output files
 inputFilePrefix = str(sys.argv[5]) #Prefix of input .npy files
-outFile = str(sys.argv[6]) #Output FITS file
+outFilePrefix = str(sys.argv[6]) #Output FITS file
 
 #Auto-generating list of input files based on prefix and number of thicknesses
 inputFileList = ["{}{}{}.npy".format(filePath,inputFilePrefix,i) for i in range(numThickness)]
+
+#Generating outfile name based on height value
+possibleHeights = {3.0:1, 5.0:2, 7.0:3, 10.0:4}
+heightIndex = possibleHeights[hCorona]
+outFile = filePath + outFilePrefix + str(possibleHeights[hCorona]) + ".fits"
 
 #Number of radial bins (relevant for FITS formating)
 nRadBins = 150
@@ -52,9 +57,9 @@ if not existBool:
 		delta = emData[0][2] #Extracting mean(delta) v. radii
 		deltaInc = np.zeros(nRadBins)
 		radiusColumn = fits.Column(name = 'r', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [radius])
-		fluxColumn = fits.Column(name = 'h1', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [flux])
-		deltaColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = [delta])
-		deltaIncColumn = fits.Column(name = 'del_inc1', format = '{}E'.format(nRadBins), unit = 'deg', array = [deltaInc])
+		fluxColumn = fits.Column(name = 'h{}'.format(heightIndex), format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = [flux])
+		deltaColumn = fits.Column(name = 'del{}'.format(heightIndex), format = '{}E'.format(nRadBins), unit = 'deg', array = [delta])
+		deltaIncColumn = fits.Column(name = 'del_inc{}'.format(heightIndex), format = '{}E'.format(nRadBins), unit = 'deg', array = [deltaInc])
 		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn,deltaIncColumn])
 		hdu = fits.BinTableHDU.from_columns(cols)
 
@@ -66,6 +71,37 @@ if not existBool:
 
 
 		del hdu
+
+else:
+	fitsData = fits.open(outFile)
+	for i in range(len(inputFileList)):
+		currentFile = inputFileList[i]
+		emData = np.load(currentFile)
+		radius = emData[0][0] #Extracting radii values
+		flux = emData[0][1] #Extracting flux v. radii
+		delta = emData[0][2] #Extracting mean(delta) v. radii
+		deltaInc = np.zeros(nRadBins)
+
+		currentHDU = fitsData[i+1].data
+		currentRadius = [currentHDU[j][0] for j in range(len(currentHDU))]
+		currentFlux = [currentHDU[j][1] for j in range(len(currentHDU))]
+		currentDelta = [currentHDU[j][2] for j in range(len(currentHDU))]
+		currentDeltaInc = [currentHDU[j][3] for j in range(len(currentHDU))]
+
+		currentRadius.append(np.array(radius,dtype='float32'))
+		currentFlux.append(np.array(flux,dtype='float32'))
+		currentDelta.append(np.array(delta,dtype='float32'))
+		currentDeltaInc.append(np.array(deltaInc,dtype='float32'))
+
+		radiusColumn = fits.Column(name = 'r', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = currentRadius)
+		fluxColumn = fits.Column(name = 'h1', format = '{}E'.format(nRadBins), unit = 'GM/c^2', array = currentFlux)
+		deltaColumn = fits.Column(name = 'del1', format = '{}E'.format(nRadBins), unit = 'deg', array = currentDelta)
+		deltaIncColumn = fits.Column(name = 'del_inc1', format = '{}E'.format(nRadBins), unit = 'deg', array = currentDeltaInc)
+		cols = fits.ColDefs([radiusColumn,fluxColumn,deltaColumn,deltaIncColumn])
+		newHDU = fits.BinTableHDU.from_columns(cols)
+		fitsData[i+1] = newHDU
+
+	fitsData.writeto(outFile,overwrite=True)
 
 """
 	fitsData = fits.open(outFile)
