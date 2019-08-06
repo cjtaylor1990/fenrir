@@ -4,6 +4,7 @@
 *.npy
 *.png
 *.fits
+.DS_Store
 
 corona_general/txt_to_npy_corona.py
 diskimg/txt_to_npy_diskimg.py

@@ -23,6 +23,15 @@ def rIsco(a):
 		sys.exit()
 	return rOut
 
+def rEvent(spin):
+	return 1+np.sqrt(1-spin**2)
+
+def findHeightIndex(spin,height,hMax=100,hNumCases=100):
+	hMin = 1.1*rEven(spin)
+	hMax = 100
+	j = (np.log10(height) - np.log10(hMin))/((np.log10(hMax)-np.log10(hMin))/(hNumCases-1))
+	return int(j)+1
+
 #Reading input parameters from command line: spin, corona_height, output_file, number_of_layers, file1, file2, ...
 a = float(sys.argv[1]) #Spin of black hole (dimensionless)
 hCorona = float(sys.argv[2]) #Height of corona along polar axis (r_g)
@@ -30,13 +39,16 @@ numThickness = int(sys.argv[3]) #Number for thicknesses used
 filePath = str(sys.argv[4]) #File path to use for input and output files
 inputFilePrefix = str(sys.argv[5]) #Prefix of input .npy files
 outFilePrefix = str(sys.argv[6]) #Output FITS file
+print(sys.argv)
 
 #Auto-generating list of input files based on prefix and number of thicknesses
 inputFileList = ["{}{}{}.npy".format(filePath,inputFilePrefix,i) for i in range(numThickness)]
 
 #Generating outfile name based on height value
-possibleHeights = {3.0:1, 5.0:2, 7.0:3, 10.0:4}
+
+possibleHeights = {3.0:1, 5.0:2, 7.0:3, 10.0:4} #For test only. Once I have full scale, I need an analytic function
 heightIndex = possibleHeights[hCorona]
+#heightInex = findHeightIndex(a,hCorona)
 outFile = filePath + outFilePrefix + str(possibleHeights[hCorona]) + ".fits"
 
 #Number of radial bins (relevant for FITS formating)
