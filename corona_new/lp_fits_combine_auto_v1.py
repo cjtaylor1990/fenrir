@@ -44,13 +44,20 @@ def read_txt_file(inFile,numVals = 1,delimiter = ' ',isFloat=True):
 
 	return outList
 
+print(sys.argv)
 #Input from command line
 filePath = str(sys.argv[1]) #File path to directory you wish to store files
 inputPrefix = str(sys.argv[2]) #Prefix of .fits files that you're loading (used for auto generating file list)
 numberHeights = int(sys.argv[3]) #Number of heights used
-numberThickness = int(sys.argv[4]) #Number of thicknesses used
-paramFile = str(sys.argv[5]) #File that stores spin values (.txt)
-outFile = filePath + str(sys.argv[6]) #Output FITS files
+initThickness = float(sys.argv[4]) #Starting (max) thickness
+finalThickness = float(sys.argv[5]) #Final (min) thickness
+numberThickness = int(sys.argv[6]) #Number of thicknesses used
+paramFile = str(sys.argv[7]) #File that stores spin values (.txt)
+outFile = filePath + str(sys.argv[8]) #Output FITS files
+
+if os.path.isfile(outFile): #Checking to see if file already exists
+	print("ERROR! File already exits!")
+	sys.exit()
 
 #Auto generating list of input .fits files
 inputFiles = [filePath + inputPrefix + str(i) + '.fits' for i in range(1,numberHeights+1)]
@@ -67,6 +74,14 @@ for i in range(len(spinArray)):
 	#Set the corresponding index in the height array equal to the subarray of
 	#height values that correspond with the spin value
 	heightArray[i] = paramArray[1,i*numberHeights : (i+1)*numberHeights] 
+
+#Creating the FITS file by first writing thickness HDU
+if numberThickness == 1:
+	thicknessArray = np.array([initThickness])
+else:
+	thicknessArray = np.array([initThickness + (finalThickness-initThickness)*i/(numberThickness-1) for i in range(numberThickness)])
+thicknessHDU = fits.BinTableHDU.from_columns([fits.Column(name = 'hd', format = '1E', array = thicknessArray)],name='hd')
+thicknessHDU.writeto(outFile)
 
 #For each thickness
 for i in range(1,numberThickness+1):
@@ -93,14 +108,8 @@ for i in range(1,numberThickness+1):
 	combinedDelInc = [fits.Column(name='del_inc{}'.format(k+1),format='150E', unit = 'deg', array = delIncColumnList[k]) for k in range(numberHeights)]
 	cols = fits.ColDefs(combinedSpin + combinedHeight + combinedRadius + combinedFlux + combinedDel + combinedDelInc) #appending the column lists together
 	hdu = fits.BinTableHDU.from_columns(cols)
+	hdu.name = "l_h_" + str(i)
 
-	if i == 1:
-		if os.path.isfile(outFile): #Checking to see if file already exists
-			print("ERROR! File already exits!")
-			sys.exit()
-		else:
-			hdu.writeto(outFile)
-	else:
-		fitsData = fits.open(outFile)
-		fitsData.append(hdu)
-		fitsData.writeto(outFile,overwrite=True)
+	fitsData = fits.open(outFile)
+	fitsData.append(hdu)
+	fitsData.writeto(outFile,overwrite=True)

@@ -27,7 +27,6 @@ output = open(outFile,'w')
 
 #For each spin value
 for spin in spinVals:
-	print(spin)
 	rEventVal = rEvent(float(spin[0]))
 	hMin = 1.1*rEventVal
 	#For each h value

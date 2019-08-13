@@ -44,58 +44,59 @@ def read_txt_file(inFile,numVals = 1,delimiter = ' ',isFloat=True):
 	return outList
 
 #Input information
-inPath = '/Users/cjtaylor/fenrir_full_tests/'
-inAfile  = inPath + 'full_spin_list.txt'
-inMuFile = inPath + 'full_mu_list.txt'
+inParamFile = input("What is your full input parameter file? ")
+paramData = read_txt_file(inParamFile, numVals=2)
 
 #Output information
-outPath = '/Users/cjtaylor/fenrir_full_tests/'
-machineNames = ['yorp1','yorp2','yorp4','yorp6','yorp7','yorp8','yorp9']
-outSuffix = '_full_parameter_list.txt'
+outPath = input("Where do you want your output files to be saved? ")
+outSuffix = '_' + input("What will be the suffix of your output files (format: [machine name]_[suffix].txt)? ") + '.txt'
 
-#Number of combinations per machine
-numComb = [130,130,130,90,90,90,90]
+#Machine information
+machineNames = str(input("What machines will you be using, seperating names by spaces? ")).lower()
+machineNames = machineNames.split(' ')
 
-#Reading in parameter values from input files
-aData = read_txt_file(inAfile)[0]
-muData = read_txt_file(inMuFile)[0]
+#Splitting jobs across machines
+isValid = False
+while not isValid:
+	behavior = input("""Do you want the jobs split evenly across each machine (default) or
+	would you like to split them yourself (custom)?  """).lower()
+	
+	if behavior == 'default':
+		numComb = [len(paramData[0])//len(machineNames) for i in range(len(machineNames))]
+		isValid = True
+	elif behavior == 'custom':
+		for i in range(len(machineNames)):
+			numComb.append(int(input("How many parameter combinations for {}? ".format(machineNames[i]))))
+		isValid = True
+	else:
+		print("Please enter valid input of either 'default' or 'custom'.\n")
+
+print(numComb)
 
 #Checking to make sure there are no errors in input
-if (sum(numComb) != len(aData)*len(muData)):
+if (sum(numComb) != len(paramData[0])):
 	errorMessage="""ERROR: The number of parameter combinations given to the machines does not match
 	the total number of possible combinations from the input lists."""
-	sys.exit(errorMessage)
-elif (len(machineNames) != len(numComb)):
-	errorMessage="""ERROR: The number of machines does not match the number of parameter combinations
-	given."""
 	sys.exit(errorMessage)
 else:
 	pass
 
-#Creating list of parameter combinations
-combData = []
-i = 0
-while (i < len(aData)):
-	j = 0
-	aVal = aData[j]
-	while (j < len(muData)):
-		combData.append([aData[i],muData[j]])
-		j+=1
-	i+=1
+k = 0 #Points to entry in full parameter combination list
+for i in range(len(machineNames)):
+	machine = machineNames[i] #Points to current machine
+	machineComb = numComb[i] #Points towards number of combinations that will be given to said machine
+	outFile = outPath + machine + outSuffix #Creating the full output file path
 
-i = 0 #Index loops over machines
-k = 0 #Index loops over the parameter combination list
-while (i < len(machineNames)):
-	machine = machineNames[i]
-	machineComb = numComb[i]
-	outFile = machine + outSuffix
-
+	#Opening output file
 	file = open(outFile,'w')
-	j = 0 #Index counts to make sure each machine is given correct number of combinations
-	while (j < machineComb):
-		file.write(str(combData[k][0]) + ' ' + str(combData[k][1]) + '\n')
-		j+=1
+
+	#Looping through the number of parameter combination spectified for the current machine
+	for j in range(machineComb): 
+		#Writing current parameter combination to end of current output file
+		file.write(str(paramData[0][k]) + ' ' + str(paramData[1][k]) + '\n')
+		
+		#Moving to next entry in full list
 		k+=1
+	#After looping through the specified number of combinations, close the current output file
 	file.close()
-	print outFile + ' finished' #Printing confirmation statement
-	i+=1
+	print(outFile + ' finished') #Printing confirmation statement

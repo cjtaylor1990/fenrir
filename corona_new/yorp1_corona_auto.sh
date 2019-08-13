@@ -1,10 +1,10 @@
 #!/bin/bash
-num_photons=25000
-num_threads=4
+num_photons=30000
+num_threads=30
 
-param_file="./corona_test_parameter_list.txt"
-machine_name="tyr"
-output_path="/Users/cjtaylor/corona_test"
+param_file="./yorp1_corona_full_params.txt"
+machine_name="yorp1"
+output_path="/yorp1a/cjtaylor"
 
 initThickness=20.0
 finalThickness=0.0
@@ -12,7 +12,9 @@ numThickness=25
 
 numRadBins=150
 
-numHeights=4
+numHeights=100
+
+heightIndex=1
 
 while INF=' ' read -ra line
 do
@@ -81,10 +83,18 @@ do
 
 	rm -f ${output_path}/${machine_name}_corona_test_cat*.npy
 
-	python lp_fits_auto_v1.py ${spin_val} ${height_val} ${numThickness} ${output_path}/ tyr_corona_test_hist test_
+	python lp_fits_auto_v1.py ${spin_val} ${height_val} ${numThickness} ${output_path}/ ${machine_name}_corona_test_hist test_ ${heightIndex}
 
 	rm -f ${output_path}/${machine_name}_corona_test_hist*.npy
+
+	heightIndex=$((heightIndex+1))
+
+	if [ $heightIndex -gt $numHeights ]
+	then
+		heightIndex=1
+	fi
+
 	echo done
 done < $param_file
 
-python lp_fits_combine_auto_v1.py ${output_path}/ test_ ${numHeights} ${initThickness} ${finalThickness} ${numThickness} ${param_file} test_combine.fits
+python lp_fits_combine_auto_v1.py ${output_path}/ test_ ${numHeights} ${initThickness} ${finalThickness} ${numThickness} ${param_file} ${machine_name}_combine.fits
