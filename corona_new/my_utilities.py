@@ -35,7 +35,7 @@ def read_txt_file(inFile,numVals = 1,delimiter = ' ',isFloat=True):
 			if isFloat==True:
 				item = float(row[i])
 			else:
-				pass
+				item = str(row[i])
 			outList[i].append(item)
 			i+=1
 
