@@ -51,7 +51,7 @@ for i in range(2,numThickness+2):
 			colsForHDU[k] += [row[k] for row in currentData]
 	
 	for j in range(numCols):
-		colsForHDU[j] = fits.Column(name=cols[j],format=formats[j],array=colsForHDU[j])
+		colsForHDU[j] = fits.Column(name=cols[j],format=formats[j],unit=units[j],array=colsForHDU[j])
 
 	colsForHDU = fits.ColDefs(colsForHDU)
 	
