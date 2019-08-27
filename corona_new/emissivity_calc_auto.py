@@ -75,7 +75,7 @@ diskHitSwitch = data[10]
 #print np.max(x)/np.pi
 
 rIn = rIsco(a)
-rOut = 500.
+rOut = 150.
 #print rIsco(a)
 
 #iRcut = np.where(np.logical_and(projectedRadius > rIn,projectedRadius < rOut, diskHitSwitch > 0.5))
@@ -90,9 +90,10 @@ specDelta = np.pi - x[iRcut]
 
 #binLimArray = np.logspace(np.log10(rIn),np.log10(rOut),nBins,endpoint=False)
 logBinWidth = (np.log10(rOut) - np.log10(rIn))/(nBins-1)
-binLimArray = [np.log10(rIn) + logBinWidth*i for i in range(nBins)]
+binLimArray = [(np.log10(rIn)-(logBinWidth)) + logBinWidth*i for i in range(nBins)]
 binLimArray.append(np.log10(rOut)+logBinWidth)
 binLimArray = 10.**(np.array(binLimArray))
+
 #binLimArray = np.linspace(rIn,rOut,nBins,endpoint=False)
 specBin = np.zeros(nBins)
 drArray = np.zeros(nBins)
@@ -124,7 +125,7 @@ while (l < nBins):
 		binDelta[l] = np.mean(deltaInBin)
 		grAreaInBin = grArea(radInBin,thetaInBin,drArray[l],a,dThetaArray[l])
 		fluxInBin = (1./(gammaInBin*grAreaInBin))*np.sin(deltaInBin)#*(energyInBin**(specIndex))#*np.sin(deltaInBin)
-		fluxArray[l] = np.sum(fluxInBin)*drArray[l]
+		fluxArray[l] = np.sum(fluxInBin)#*drArray[l]
 	else:
 		fluxInBin = 0.
 		fluxArray[l] = 0.

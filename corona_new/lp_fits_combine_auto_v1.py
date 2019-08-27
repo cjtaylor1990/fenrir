@@ -73,7 +73,7 @@ heightArray = np.zeros((len(spinArray),numberHeights)) #Alocating array for heig
 for i in range(len(spinArray)):
 	#Set the corresponding index in the height array equal to the subarray of
 	#height values that correspond with the spin value
-	heightArray[i] = paramArray[1,i*numberHeights : (i+1)*numberHeights] 
+	heightArray[i] = paramArray[1,i*numberHeights : (i+1)*numberHeights]
 
 #Creating the FITS file by first writing thickness HDU
 if numberThickness == 1:
