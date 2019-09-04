@@ -70,7 +70,7 @@ def calculate_g_factor(metric, disk, posVec, coronaHeight):
 	posVecCorona = [0.0, coronaHeight, 0.0, 0.0]
 	top = metric.gTT(posVecCorona)
 	bottom = metric.gTT(posVec) + (2.*metric.gTPh(posVec)*disk.omega(posVec[1]*np.sin(posVec[2]))) + (metric.gPhPh(posVec)*(disk.omega(posVec[1]*np.sin(posVec[2]))**2.))
-	return np.sqrt(top/bottom)
+	return np.sqrt(-1./bottom)#top/bottom)
 
 def find_posVec(metric, disk, projRad):
 	z = disk.z(projRad)
@@ -87,6 +87,7 @@ def find_posVec(metric, disk, projRad):
 spin = float(sys.argv[1])
 height = float(sys.argv[2])
 thickness = float(sys.argv[3])
+outFile = sys.argv[4]
 
 #Creating the metric and disk instances
 metric = Kerr_Metric(spin)
@@ -96,16 +97,21 @@ disk = Disk(metric, thickness)
 rIn = disk.rIsco()
 rOut = 100.0
 numRad = 1000
-sampleRadii = np.linspace(rIn,rOut,numRad)
+sampleRadii = np.linspace(rIn,rOut,numRad+1)
+
+#Finding median of radial bins
+medianRadii = (sampleRadii[1:]+sampleRadii[:-1])/2.
 
 #Creating a list of g-factors (for each radius, you find the 4-position vector, which then is used to calculate the g-factor)
-gFactorList = [calculate_g_factor(metric,disk,find_posVec(metric, disk, projRad),height) for projRad in sampleRadii]
+gFactorList = [calculate_g_factor(metric,disk,find_posVec(metric, disk, projRad),height) for projRad in medianRadii]
 
 #Plotting g vs. radius
-pl.plot(sampleRadii, gFactorList)
+pl.plot(medianRadii, gFactorList)
 pl.xscale('log')
 pl.yscale('log')
 pl.show()
+
+np.save(outFile, np.array([gFactorList,medianRadii]))
 
 
 

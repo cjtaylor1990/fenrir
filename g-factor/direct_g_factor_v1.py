@@ -67,4 +67,4 @@ pl.xscale('log')
 pl.xlim([1.,100.])
 pl.show()
 
-np.save(outFile, np.array([meanEnergy, medianRadii]))
+np.save(outFile, np.array([meanEnergy[0], medianRadii]))
