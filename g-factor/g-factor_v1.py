@@ -70,7 +70,7 @@ def calculate_g_factor(metric, disk, posVec, coronaHeight):
 	posVecCorona = [0.0, coronaHeight, 0.0, 0.0]
 	top = metric.gTT(posVecCorona)
 	bottom = metric.gTT(posVec) + (2.*metric.gTPh(posVec)*disk.omega(posVec[1]*np.sin(posVec[2]))) + (metric.gPhPh(posVec)*(disk.omega(posVec[1]*np.sin(posVec[2]))**2.))
-	return top/bottom
+	return np.sqrt(top/bottom)
 
 def find_posVec(metric, disk, projRad):
 	z = disk.z(projRad)
@@ -103,6 +103,8 @@ gFactorList = [calculate_g_factor(metric,disk,find_posVec(metric, disk, projRad)
 
 #Plotting g vs. radius
 pl.plot(sampleRadii, gFactorList)
+pl.xscale('log')
+pl.yscale('log')
 pl.show()
 
 
