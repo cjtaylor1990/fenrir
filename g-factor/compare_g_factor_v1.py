@@ -13,7 +13,7 @@ data2 = np.load(file2)
 
 #Overplotting each of them
 pl.plot(data1[1], data1[0], c='k')
-pl.plot(data2[1], data2[0], c='r')
+pl.scatter(data2[1], data2[0], c='r')
 pl.xscale('log')
 pl.yscale('log')
 pl.show()

@@ -60,7 +60,7 @@ class Disk:
 		if projRad < self.rIsco():
 			return 0
 		else:
-			return self.thickness*np.sqrt(1-(self.rIsco()/projRad))
+			return self.thickness*(1.-np.sqrt(self.rIsco()/projRad))
 
 	def omega(self,projRad):
 		return 1./((projRad**1.5) + self.metric.a)
