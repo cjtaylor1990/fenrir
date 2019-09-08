@@ -1,7 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 double rIsco(double spin) {
-	double z1 = 1.0 + (1.0 - pow((spin*spin), 1.0/3.0))*(pow(1.0+spin, 1.0/3.0) + (pow(1.0-spin, 1.0/3.0)));
+	double z1 = 1.0 + pow(1.0 - (spin*spin),1.0/3.0)*(pow(1.0+spin, 1.0/3.0) + (pow(1.0-spin, 1.0/3.0)));
 	double z2 = sqrt((3.0*spin*spin) + z1*z1);
 	double firstTerm = 3.0 + z2;
 	double secondTerm = sqrt((3.0 - z1)*(3.0 + z1 + 2.0*z2));
@@ -71,10 +73,33 @@ double fenrirGfactor(double spin, double thickness, double coronaHeight, double 
 
 	double bottom = diskTT + (2.0*diskTPh*diskOmega) + (diskPhPh*diskOmega*diskOmega);
 
-	return sqrt(diskTT/bottom);
+	return sqrt(coronaTT/bottom);
 
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+	double spin = atof(argv[1]);
+	double coronaHeight = atof(argv[2]);
+	double thickness = atof(argv[3]);
+	int numberOfRadii = atoi(argv[4]);
+	double rMax = atof(argv[5]);
+
+	double rMin = rIsco(spin);
+	double delR = (rMax-rMin)/(numberOfRadii-1);
+
+	printf("%f %f\n",spin, rMin);
+
+	double currentG;
+	double currentCylRadius;
+	FILE *fp;
+	fp = fopen("output.txt", "w");
+	for (int i = 0; i < numberOfRadii; i++) {
+		currentCylRadius = rMin + (delR*i);
+		currentG = fenrirGfactor(spin, thickness, coronaHeight, currentCylRadius);
+		fprintf(fp, "%f %f\n", currentCylRadius, currentG);
+	}
+	fclose(fp);
+
 	return 0;
+
 }
