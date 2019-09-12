@@ -73,7 +73,7 @@ double fenrirGfactor(double spin, double thickness, double coronaHeight, double 
 
 	double bottom = diskTT + (2.0*diskTPh*diskOmega) + (diskPhPh*diskOmega*diskOmega);
 
-	return sqrt(-1./bottom);//coronaTT/bottom);
+	return sqrt(coronaTT/bottom);
 
 }
 
