@@ -23,7 +23,7 @@ diskDirPath = path to directory that holds the disk images that will be used
 lpDirPath = path to the directory that holds the emissivity profile file that will be used
 outDirPath = path to the directory that will contain the output line profile file
 
-It is assumed that the disk files, the emissivity file, and the output line profile file will all be of the .npy format.
+It is assumed that the disk files, the emissivity file, and the output line profile file will all be of the .txt format.
 """
 
 
@@ -67,34 +67,49 @@ def rIsco(a):
 	
 	return rIscoOut
 
-a = float(sys.argv[1])
-nEnergyBins = 4096
+#Unpacking argv: spin, spinIndex, inclinationIndex, heightIndex, diskThicknessIndex, diskFilePath, lpFilePath, outDirPath
+a = float(sys.argv[1]) #spin as a float
 
-diskDirectoryPath = sys.argv[2]
-lpDirectoryPath = sys.argv[3]
-outDirectoryPath = sys.argv[4]
-caseNum = sys.argv[5]
-diskNum = sys.argv[6]
-diskFiles = [diskDirectoryPath + 'yorp7_'+caseNum+'_cat'+str(catNum)+'_'+diskNum+'.npy' for catNum in range(1,4)]
-lpFile = lpDirectoryPath + 'yorp1_em_test_hist_cat'+diskNum + '_' + caseNum + '.npy'
-outFile = outDirectoryPath + 'line_offhd_'+caseNum+'_'+diskNum+'.npy'
-outText = outDirectoryPath + 'line_offhd_'+caseNum+'_'+diskNum+'.txt'
+#Parameter indices to find correct input files
+spinIndex = sys.argv[2]
+inclinationIndex = sys.argv[3]
+heightIndex = sys.argv[4]
+diskThicknessIndex = sys.argv[5]
+
+#Input directory paths
+diskDirectoryPath = sys.argv[6]
+lpDirectoryPath = sys.argv[7]
+
+#Output directory path
+outDirectoryPath = sys.argv[8]
+
+#Finding the path to the disk images, emissivity profiles, and output line profile files
+diskFiles = [diskDirectoryPath + 'diskimg_a'+ spinIndex + '_i' + inclinationIndex + '_t' \
+	+ diskThicknessIndex + '_z' +str(catNum) +'.npy' for catNum in range(1,4)]
+
+lpFile = lpDirectoryPath + 'em_hist_a' + spinIndex + '_h' + heightIndex + '_t' + diskThicknessIndex + '.npy'
+
+outLineFile = outDirectoryPath + 'line_a' + spinIndex + '_i' + inclinationIndex + '_h' \
+	+ heightIndex + '_t' + diskThicknessIndex + '.txt'
 
 #Inner and outer cylindrical radii to be used for each disk image level
 rInVals = [rIsco(a),10.,30.]
 rOutVals = [10.,30.,100.]
 
-#Solid angle correction factors based on size of disk images
-solidAngCorrect = [(1./49.),(1./9.),1.]
-
-#energyBins = np.linspace(0.002, 2.002, nEnergyBins+1)#10.**np.linspace(np.log10(0.00035), np.log10(2000.), nEnergyBins+1)
-energyBins = 10.**np.linspace(np.log10(0.00035), np.log10(2000.), nEnergyBins+1)
-deltaE = energyBins[1:]-energyBins[:-1]
+#Solid angle correction factors based on size of disk images. Calculated as relative size of solid angle of single pixel, relative largest image
+totalImageLengths = np.array([30., 70., 210.])
+solidAngCorrect = (totalImageLengths/totalImageLengths[-1])**2.
 
 #From RELXILL:
 #define N_ENER_CONV  4096  // number of bins for the convolution, not that it needs to follow 2^N because of the FFT
 #define EMIN_RELXILL 0.00035  // minimal energy of the convolution (in keV)
 #define EMAX_RELXILL 2000.0 // minimal energy of the convolution (in keV)
+#Creating the lineprofile energy grid that will be correct for the convolution process
+nEnergyBins = 4096
+relxillEmin = 0.00035
+relxillEmax = 2000.0
+energyBins = 10.**np.linspace(np.log10(relxillEmin), np.log10(relxillEmax), nEnergyBins+1)
+deltaE = energyBins[1:]-energyBins[:-1]
 midEnergy = (energyBins[1:] + energyBins[:-1])/2.
 
 #Loading in emissivity file. Format: emmisivity array = np.array([[binLimArray[:-1],fluxArray,binDelta],a,hCorona])
@@ -142,4 +157,4 @@ for i in range(len(diskFiles)):
 
 
 lineProfile = lineProfile*deltaE
-writeDataToTextFile(outFile,lineProfile)
+writeDataToTextFile(outLineFile,lineProfile)
