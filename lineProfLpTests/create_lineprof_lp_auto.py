@@ -84,10 +84,10 @@ lpDirectoryPath = sys.argv[7]
 outDirectoryPath = sys.argv[8]
 
 #Finding the path to the disk images, emissivity profiles, and output line profile files
-diskFiles = [diskDirectoryPath + 'diskimg_a'+ spinIndex + '_i' + inclinationIndex + '_t' \
+inDiskFiles = [diskDirectoryPath + 'diskimg_a'+ spinIndex + '_i' + inclinationIndex + '_t' \
 	+ diskThicknessIndex + '_z' +str(catNum) +'.npy' for catNum in range(1,4)]
 
-lpFile = lpDirectoryPath + 'em_hist_a' + spinIndex + '_h' + heightIndex + '_t' + diskThicknessIndex + '.npy'
+inLpFile = lpDirectoryPath + 'em_hist_a' + spinIndex + '_h' + heightIndex + '_t' + diskThicknessIndex + '.npy'
 
 outLineFile = outDirectoryPath + 'line_a' + spinIndex + '_i' + inclinationIndex + '_h' \
 	+ heightIndex + '_t' + diskThicknessIndex + '.txt'
@@ -113,7 +113,7 @@ deltaE = energyBins[1:]-energyBins[:-1]
 midEnergy = (energyBins[1:] + energyBins[:-1])/2.
 
 #Loading in emissivity file. Format: emmisivity array = np.array([[binLimArray[:-1],fluxArray,binDelta],a,hCorona])
-lpData = np.load(lpFile)
+lpData = np.load(inLpFile)
 lpRadii = lpData[0][0]
 lpFlux = lpData[0][1]
 
@@ -121,8 +121,8 @@ lpFlux = lpData[0][1]
 lineProfile = np.zeros(nEnergyBins)
 
 #Going over each disk file to calculate individual contributions to the line profile flux
-for i in range(len(diskFiles)):
-	diskFile = diskFiles[i]
+for i in range(len(inDiskFiles)):
+	diskFile = inDiskFiles[i]
 	rIn = rInVals[i]
 	rOut = rOutVals[i]
 	correction = solidAngCorrect[i]
@@ -145,7 +145,6 @@ for i in range(len(diskFiles)):
 	#Creating arrays with radius cut from iRcut
 	specRadius = projectedRadius[iRcut]
 	specEnergy = gRatio[iRcut]
-
 
 	#For each photon in disk file, finding corresponding lpFlux from its cylindrical radius (specRadius) using binary search
 	radIndices = np.searchsorted(lpRadii,specRadius,sorter=None)
