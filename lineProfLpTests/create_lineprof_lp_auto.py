@@ -5,6 +5,28 @@ import matplotlib
 import csv
 import sys
 
+"""
+This script will take in a series of disk images (one for each zoom level) and one emissivity profile. These are
+found via the parameter indices and the paths given to the script from the command line. It outputs a lineprofile
+that will act as the convolution kernel for the reflection spectrum that is generated in XSPEC with a modified version
+of RELXILL.
+
+The input layout is: 
+python3 create_lineprof_lp_auto.py $spin $spinIndex $inclinationIndex $heightIndex $diskThicknessIndex $diskFilePath $lpFilePath $outDirPath
+
+spin = black hole spin value
+spinIndex = index of the current spin value
+inclinationIndex = index of the current inclination value
+heightIndex = index of the current LP height value
+diskThicknessIndex = index of the current asymtotic disk thickness value
+diskDirPath = path to directory that holds the disk images that will be used
+lpDirPath = path to the directory that holds the emissivity profile file that will be used
+outDirPath = path to the directory that will contain the output line profile file
+
+It is assumed that the disk files, the emissivity file, and the output line profile file will all be of the .npy format.
+"""
+
+
 def writeDataToTextFile(fileName, dataToWrite, numberDataColumns=1):
 	if numberDataColumns <= 0:
 		raise ValueError('You must have a positive number of data columns to write')
@@ -18,8 +40,10 @@ def writeDataToTextFile(fileName, dataToWrite, numberDataColumns=1):
 			outputToFile.write(str(dataToWrite[i] + '\n'))
 	else:
 		for i in range(numberDataColumns):
+			currentRow = ''
 			for j in range(len(dataToWrite[0])):
-				outputToFile.write(str(dataToWrite[i][j] + '\n'))
+				currentRow += currentRow + str(dataToWrite[i][j]) + ' '
+				outputToFile.write(currentRow[:-1] + '\n')
 	outputToFile.close()
 
 def rIsco(a):
@@ -27,15 +51,20 @@ def rIsco(a):
 	radii Rg) for a given dimensionless spin value. |a| <= 1
 
 	Example: rIsco(0) => 6.0 """
+
+	if type(a) not in [int, float]:
+		raise TypeError('Spin must be either a int or float type between -1 and 1, inclusive.')
+	
 	z1 = 1 + (((1-(a*a))**(1./3.))*(((1+a)**(1./3.))+((1-a)**(1./3.))))
 	z2 = ((3*(a*a))+(z1*z1))**0.5
+	
 	if (a < 0) and (a >= -1):
 		rIscoOut = 3+z2+(((3-z1)*(3+z1+(2.*z2)))**0.5)
 	elif (a >= 0) and (a <= 1):
 		rIscoOut = 3+z2-(((3-z1)*(3+z1+(2.*z2)))**0.5)
 	else:
-		print("ERROR: Spin parameter must be within range of -1 to 1, inclusive.")
-		sys.exit()
+		raise ValueError('Spin value must be between -1 and 1, inclusive.')
+	
 	return rIscoOut
 
 a = float(sys.argv[1])

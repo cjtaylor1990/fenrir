@@ -1,7 +1,7 @@
 machine="Loki"
 
-diskFilePath="/Volumes/${machine}/multi_grid_test_data/ongrid_test/"
-lpFilePath="/Volumes/${machine}/fenrir_full_test/emissivity_files/"
+diskDirPath="/Volumes/${machine}/multi_grid_test_data/ongrid_test/"
+lpDirPath="/Volumes/${machine}/fenrir_full_test/emissivity_files/"
 
 outDirPath="/Volumes/${machine}/fenrir_full_test/lineprof_lp_files/"
 
@@ -15,16 +15,18 @@ spinIndex=0
 while INF=' ' read -ra spinLine; do
 	spin=${spinLine[0]}
 
+	inclinationIndex=0
 	while INF=' ' read -ra inclinationLine; do
 		inclination=${inclinationLine[0]}
 
+		heightIndex=0
 		while INF =' ' read -ra heightLine; do
 			height=${heightLine[0]}
 	
 			diskThicknessIndex=0
 			while [ $diskThicknessIndex -lt $numDiskThicknesses ]; do
 		
-				python3 create_lineprof_lp_auto.py $spin $spinIndex $inclinationIndex $heightIndex $diskThicknessIndex $diskFilePath $lpFilePath $outDirPath
+				python3 create_lineprof_lp_auto.py $spin $spinIndex $inclinationIndex $heightIndex $diskThicknessIndex $diskDirPath $lpDirPath $outDirPath
 				echo $spinIndex $inclinationIndex $heightIndex $diskThicknessIndex
 				
 				diskThicknessIndex=$((diskThicknessIndex+1))
