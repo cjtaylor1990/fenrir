@@ -12,7 +12,7 @@ inclinationParamFile="/Volumes/${machine}/fenrir_full_test/full_inc_params.txt"
 numSpins=3
 numInclinations=3
 numHeights=11
-numDiskThicknesses = 11
+numDiskThicknesses=11
 
 spinIndex=0
 while INF=' ' read -ra spinLine; do
@@ -23,7 +23,7 @@ while INF=' ' read -ra spinLine; do
 		inclination=${inclinationLine[0]}
 
 		heightIndex=0
-		while INF =' ' read -ra heightLine; do
+		while INF=' ' read -ra heightLine; do
 			height=${heightLine[0]}
 
 			diskCombinationIndex=$((inclinationIndex + spinIndex*numInclinations))
