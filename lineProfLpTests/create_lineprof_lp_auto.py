@@ -71,9 +71,8 @@ def rIsco(a):
 a = float(sys.argv[1]) #spin as a float
 
 #Parameter indices to find correct input files
-#Input directory paths
-diskDirectoryPath = sys.argv[2]
-lpDirectoryPath = sys.argv[3]
+diskCombinationIndex = sys.argv[2]
+lpCombinationIndex = sys.argv[3]
 diskThicknessIndex = sys.argv[4]
 
 #Input directory paths
@@ -84,13 +83,13 @@ lpDirectoryPath = sys.argv[6]
 outDirectoryPath = sys.argv[7]
 
 #Finding the path to the disk images, emissivity profiles, and output line profile files
-inDiskFiles = [diskDirectoryPath + 'diskimg_a'+ spinIndex + '_i' + inclinationIndex + '_t' \
-	+ diskThicknessIndex + '_z' +str(catNum) +'.npy' for catNum in range(1,4)]
+inDiskFiles = [diskDirectoryPath + 'yorp7_' + diskThicknessIndex + 'cat' + str(zoomLevel) \
+	+ '_' + diskCombinationIndex for zoomLevel in range(1,4)]
 
-inLpFile = lpDirectoryPath + 'em_hist_a' + spinIndex + '_h' + heightIndex + '_t' + diskThicknessIndex + '.npy'
+inLpFile = lpDirectoryPath + 'yorp14_em_test_cat' + diskThicknessIndex + '_' + lpCombinationIndex + '.npy'
 
-outLineFile = outDirectoryPath + 'line_a' + spinIndex + '_i' + inclinationIndex + '_h' \
-	+ heightIndex + '_t' + diskThicknessIndex + '.txt'
+outLineFile = outDirectoryPath + 'line_disk' + diskCombinationIndex + '_lp' + lpCombinationIndex\
+	+ '_thickness' + diskThicknessIndex + '.txt'
 
 #Inner and outer cylindrical radii to be used for each disk image level
 rInVals = [rIsco(a),10.,30.]
