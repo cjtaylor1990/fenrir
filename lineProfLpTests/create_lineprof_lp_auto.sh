@@ -32,7 +32,7 @@ while INF=' ' read -ra spinLine; do
 			diskThicknessIndex=0
 			while [ $diskThicknessIndex -lt $numDiskThicknesses ]; do
 		
-				python3 create_lineprof_lp_auto.py $spin $spinIndex $inclinationIndex $heightIndex $diskThicknessIndex $diskDirPath $lpDirPath $outDirPath
+				python3 create_lineprof_lp_auto.py $spin $diskCombinationIndex $lpCombinationIndex $diskThicknessIndex $diskDirPath $lpDirPath $outDirPath
 				echo $spinIndex $inclinationIndex $heightIndex $diskThicknessIndex
 				
 				diskThicknessIndex=$((diskThicknessIndex+1))

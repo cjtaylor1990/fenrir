@@ -67,21 +67,21 @@ def rIsco(a):
 	
 	return rIscoOut
 
-#Unpacking argv: spin, spinIndex, inclinationIndex, heightIndex, diskThicknessIndex, diskFilePath, lpFilePath, outDirPath
+#Unpacking argv: spin, diskCombinationIndex, lpCombinationIndex, diskThicknessIndex, diskFilePath, lpFilePath, outDirPath
 a = float(sys.argv[1]) #spin as a float
 
 #Parameter indices to find correct input files
-spinIndex = sys.argv[2]
-inclinationIndex = sys.argv[3]
-heightIndex = sys.argv[4]
-diskThicknessIndex = sys.argv[5]
+#Input directory paths
+diskDirectoryPath = sys.argv[2]
+lpDirectoryPath = sys.argv[3]
+diskThicknessIndex = sys.argv[4]
 
 #Input directory paths
-diskDirectoryPath = sys.argv[6]
-lpDirectoryPath = sys.argv[7]
+diskDirectoryPath = sys.argv[5]
+lpDirectoryPath = sys.argv[6]
 
 #Output directory path
-outDirectoryPath = sys.argv[8]
+outDirectoryPath = sys.argv[7]
 
 #Finding the path to the disk images, emissivity profiles, and output line profile files
 inDiskFiles = [diskDirectoryPath + 'diskimg_a'+ spinIndex + '_i' + inclinationIndex + '_t' \
