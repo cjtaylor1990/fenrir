@@ -67,6 +67,16 @@ def rIsco(a):
 	
 	return rIscoOut
 
+def calculateLineProfileContribution(lpFlux, lpRadii, specEnergy, specRadius):
+	#For each photon in disk file, finding corresponding lpFlux from its cylindrical radius (specRadius) using binary search
+	radIndices = np.searchsorted(lpRadii,specRadius,sorter=None)
+	photonLPFlux = np.array([lpFlux[radIndices[j]] for j in len(radIndices)])
+	
+	#Creating line profile via histogram
+	indivFlux = (specEnergy**3.)*photonLPFlux*correction
+	lineProfileContribution = np.histogram(specEnergy, bins = energyBins, weights = indivFlux)[0]
+	return lineProfileContribution
+
 #Unpacking argv: spin, diskCombinationIndex, lpCombinationIndex, diskThicknessIndex, diskFilePath, lpFilePath, outDirPath
 a = float(sys.argv[1]) #spin as a float
 
@@ -145,13 +155,8 @@ for i in range(len(inDiskFiles)):
 	specRadius = projectedRadius[iRcut]
 	specEnergy = gRatio[iRcut]
 
-	#For each photon in disk file, finding corresponding lpFlux from its cylindrical radius (specRadius) using binary search
-	radIndices = np.searchsorted(lpRadii,specRadius,sorter=None)
-	photonLPFlux = np.array([lpFlux[radIndices[j]] for j in len(radIndices)])
-	
-	#Creating line profile via histogram
-	indivFlux = (specEnergy**3.)*photonLPFlux*correction
-	lineProfile = lineProfile + (np.histogram(specEnergy, bins = energyBins, weights = indivFlux))[0]
+	#Calculating line profile contribution from current disk file
+	lineProfile = lineProfile + calculateLineProfileContribution(lpFlux,lpRadii,specEnergy,specRadius)
 
 
 lineProfile = lineProfile*deltaE
