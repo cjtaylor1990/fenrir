@@ -9,6 +9,9 @@ spinParamFile="/Volumes/${machine}/fenrir_full_test/full_spin_params.txt"
 heightParamFile="/Volumes/${machine}/fenrir_full_test/full_height_params.txt"
 inclinationParamFile="/Volumes/${machine}/fenrir_full_test/full_inc_params.txt"
 
+numSpins=3
+numInclinations=3
+numHeights=11
 numDiskThicknesses = 11
 
 spinIndex=0
@@ -22,6 +25,9 @@ while INF=' ' read -ra spinLine; do
 		heightIndex=0
 		while INF =' ' read -ra heightLine; do
 			height=${heightLine[0]}
+
+			diskCombinationIndex=$((inclinationIndex + spinIndex*numInclinations))
+			lpCombinationIndex=$((heightIndex + spinIndex*numHeights))
 	
 			diskThicknessIndex=0
 			while [ $diskThicknessIndex -lt $numDiskThicknesses ]; do
