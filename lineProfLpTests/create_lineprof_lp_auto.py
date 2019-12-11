@@ -23,6 +23,9 @@ lpDirPath = path to the directory that holds the emissivity profile file that wi
 outDirPath = path to the directory that will contain the output line profile file
 
 It is assumed that the disk files, the emissivity file, and the output line profile file will all be of the .txt format.
+
+TODO: Figure out how to keep the disk images in memory and then loop over the different heights instead of having to load then
+each time. I would like to do this in the future, but it is not necessary for these tests.
 """
 
 
