@@ -70,7 +70,7 @@ def rIsco(a):
 def calculateLineProfileContribution(lpFlux, lpRadii, specEnergy, specRadius):
 	#For each photon in disk file, finding corresponding lpFlux from its cylindrical radius (specRadius) using binary search
 	radIndices = np.searchsorted(lpRadii,specRadius,sorter=None)
-	photonLPFlux = np.array([lpFlux[radIndices[j]] for j in len(radIndices)])
+	photonLPFlux = np.array([lpFlux[radIndices[j]] for j in range(len(radIndices))])
 	
 	#Creating line profile via histogram
 	indivFlux = (specEnergy**3.)*photonLPFlux*correction
