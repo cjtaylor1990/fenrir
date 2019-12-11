@@ -37,7 +37,7 @@ def writeDataToTextFile(fileName, dataToWrite, numberDataColumns=1):
 
 	if numberDataColumns == 1:
 		for i in range(len(dataToWrite)):
-			outputToFile.write(str(dataToWrite[i] + '\n'))
+			outputToFile.write(str(dataToWrite[i]) + '\n')
 	else:
 		for i in range(numberDataColumns):
 			currentRow = ''
