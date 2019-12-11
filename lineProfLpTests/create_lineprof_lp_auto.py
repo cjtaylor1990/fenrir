@@ -12,12 +12,11 @@ that will act as the convolution kernel for the reflection spectrum that is gene
 of RELXILL.
 
 The input layout is: 
-python3 create_lineprof_lp_auto.py $spin $spinIndex $inclinationIndex $heightIndex $diskThicknessIndex $diskFilePath $lpFilePath $outDirPath
+python3 create_lineprof_lp_auto.py $spin $diskCombinationIndex $lpCombinationIndex $diskThicknessIndex $diskDirPath $lpDirPath $outDirPath
 
 spin = black hole spin value
-spinIndex = index of the current spin value
-inclinationIndex = index of the current inclination value
-heightIndex = index of the current LP height value
+diskCombinationIndex = index representative of the disk image parameter combination (inclinationIndex + spinIndex*numberOfSpins)
+lpCombinationIndex = index represenative of the emissivity profile parameter combination (heightIndex + spinIndex*numberOfSpins)
 diskThicknessIndex = index of the current asymtotic disk thickness value
 diskDirPath = path to directory that holds the disk images that will be used
 lpDirPath = path to the directory that holds the emissivity profile file that will be used
