@@ -92,8 +92,8 @@ lpDirectoryPath = sys.argv[6]
 outDirectoryPath = sys.argv[7]
 
 #Finding the path to the disk images, emissivity profiles, and output line profile files
-inDiskFiles = [diskDirectoryPath + 'yorp7_' + diskThicknessIndex + '_cat' + str(zoomLevel) \
-	+ '_' + diskCombinationIndex + '.npy' for zoomLevel in range(1,4)]
+inDiskFiles = [diskDirectoryPath + 'yorp7_' + diskCombinationIndex + '_cat' + str(zoomLevel) \
+	+ '_' + diskThicknessIndex + '.npy' for zoomLevel in range(1,4)]
 
 inLpFile = lpDirectoryPath + 'yorp14_em_test_hist' + diskThicknessIndex + '_' + lpCombinationIndex + '.npy'
 
