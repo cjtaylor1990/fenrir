@@ -1,12 +1,12 @@
 #!/bin/bash
-inPath="/Users/cjtaylor/fenrir_full_tests"
+inPath="/Users/cjtaylor/fenrir_full_tests/tests"
 outPath="/Users/cjtaylor/data"
-line_path="${inPath}/fenrir_lp_direct_lines"
+linePath="${inPath}/fenrir_lp_direct_lines"
 
 
-spinParamFile="${inPath}/full_spin_params.txt"
-heightParamFile="${inPath}/full_height_params.txt"
-inclinationParamFile="${inPath}/full_inc_params.txt"
+spinParamFile="${inPath}/full_lp_thickdisk_spin_params.txt"
+heightParamFile="${inPath}/full_lp_thickdisk_height_params.txt"
+inclinationParamFile="${inPath}/full_lp_thickdisk_inc_converted_params.txt"
 
 numSpins=3
 numInclinations=3
@@ -34,7 +34,7 @@ while INF=' ' read -ra spinLine; do
 			diskThicknessIndex=0
 			while [ $diskThicknessIndex -lt $numDiskThicknesses ]; do
 
-				lineFile="${linePath}line_disk${diskCombinationIndex}_lp${lpCombinationIndex}_thickness${diskThicknessIndex}.txt"
+				lineFile="${linePath}/line_disk${diskCombinationIndex}_lp${lpCombinationIndex}_thickness${diskThicknessIndex}.txt"
 				cp ${lineFile} ./corbin.dat
 
 				qdpFile="${outPath}/lp_direct_disk${diskCombinationIndex}_lp${lpCombinationIndex}_thickness${diskThicknessIndex}.qdp"
@@ -45,15 +45,13 @@ while INF=' ' read -ra spinLine; do
 				lmod relxill ./
 				dummy 0.1 100.0 10000
 				model relconv_lp(xillver)
-				3
-				3
-				10
-				${spin}
 				${height}
+				${spin}
 				${inclination}
 				-1
-				10
+				100
 				0
+				2
 				2
 				3.7
 				300
@@ -62,7 +60,6 @@ while INF=' ' read -ra spinLine; do
 				${inclination}
 				-1
 				1
-			
 				cpd /xs
 				pl eem
 				ipl
