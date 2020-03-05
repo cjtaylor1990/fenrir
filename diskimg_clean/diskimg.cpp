@@ -9,8 +9,6 @@
 #include "disk_equations_new.h"
 #include "propagate_rk4_thindisk_new.h"
 
-//Last update by Corbin Taylor at 11:28 am on 3/27/19
-
 //This allows me to convert an integer into a string, overcoming the version problems on galaxy (outdated icc compiler)
 #include <string>
 #include <sstream>
@@ -35,8 +33,8 @@ int main(int argc, char* argv[]){
 	int colPerProc = n/totProcs; //calculating columns per parallel process
     
     //Physical parameters
-    a = atof(argv[4]);//0.0;
-	inclination = acos(atof(argv[5]));//15.0;
+    a = atof(argv[4]); //black hole spin (dimensionless)
+	inclination = acos(atof(argv[5])); //disk inclination (degrees)
 	
 	//Accretion parameters (initAcc > finalAcc)
 	numThickness = atoi(argv[6]);
@@ -83,31 +81,14 @@ int main(int argc, char* argv[]){
 	//Initializing the array of output streams
 	std::ofstream outStreams[numThickness];
 	
-	//Initializing the array of stream names
-	//const char* outNames[numAcc];
-	
-	//Filling stream name array
-	//int fileIndex = 0;
-	//while (fileIndex < numAcc){
-	//	outNames[fileIndex] = outFilePrefix + ;
-	//	fileIndex += 1;
-	//}
-	int fileIndex = 0;
-	
 	//Opening up each of the output streams by looping over output stream array outStreams
-	//int fileIndex = 0;
 	std::string fileName;
+	int fileIndex = 0;
 	while (fileIndex < numThickness){
 		fileName = outFilePrefix + "_" + patch::to_string(fileIndex) + ".txt";
 		outStreams[fileIndex].open(fileName.c_str());
 		fileIndex += 1;
 	}
-	
-	//Setting accretion rate to the initial accretion value (initAcc)
-	//accretion = initAcc;
-	
-	//Defining the front normalization term of the disk height equation (above the mid-plane)
-	//heightFrontTerm = 2.*(3./(2.*efficiency))*accretion; //Calculating the front term of the scale height equation //
 	
     //Looping over NxN image plane
     int j,k; //defining looping dummy variables. j is x variable. k is y variable
