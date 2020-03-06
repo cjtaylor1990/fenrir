@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include "ic1_multi_new.h"
 #include "variable_names.h"
 #include "photon_geos_thindisk.h"
 #include "metric_kerr.h"
