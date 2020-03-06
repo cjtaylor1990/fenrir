@@ -32,10 +32,6 @@ double Disk::scaleHeight(double position[4]) {
   	}
 }
 
-bool Disk::isAbove(double position[4]) {
-	return (verticalHeight(position) > scaleHeight(position));
-}
-
 double Disk::diskPhiVel(Metric metric, double position[4]) {
 	double a = metric.spin();
 	double r = cylindricalR(position);
