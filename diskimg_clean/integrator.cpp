@@ -37,7 +37,16 @@ void Integrator::refineStepSize(Photon photon, Metric metric, double kR, double 
     stepSize = -1.*stepSize;
 }
 
+bool Integrator::hasHitDisk(Photon photon, Disk disk) {
+    double position[4] = {photon.time(), photon.radius(), photon.theta(), photon.phi()};
+    return verticalHeight(position) <= disk.scaleHeight(position);
+}
+
 void Integrator::propagate(Metric metric, Photon photon, Disk disk){
+
+    //Defining arrays that will hold the new photon position
+    double newPosition[4];
+    double newMomentum[4];
 
     //Defining the RK4 test position vector
     double testPosition[4];
@@ -60,7 +69,7 @@ void Integrator::propagate(Metric metric, Photon photon, Disk disk){
 	int i = 0;
 
     //starting main processing loop.  Will continue while i is less than the maximum number of steps and the radial distance is less than the minimal value specified
-	while ((i < maxNumSteps) && (photon.radius() > rMin) && (disk.isAbove(photon)){
+	while ((i < maxNumSteps) && (photon.radius() > rMin) && (hasHitDisk(photon, disk))) {
         
         //Setting first test position
         testPosition[0] = photon.time();
@@ -147,14 +156,20 @@ void Integrator::propagate(Metric metric, Photon photon, Disk disk){
         phiStep = (stepSize/6.)*(kPhiArray[0]+(2.*kPhiArray[1])+(2.*kPhiArray[2])+kPhiArray[3]);
 
         //Updating the photon's position vector
-        double newPosition[4] = {photon.time() + tStep, photon.radius() + rStep, photon.theta() + thStep, photon.phi() + phiStep};
+        newPosition[0] = photon.time() + tStep;
+        newPosition[1] = photon.radius() + rStep;
+        newPosition[2] = photon.theta() + thStep;
+        newPosition[3] = photon.phi() + phiStep;
 		photon.updatePosition(newPosition);
 
         //Updating the photon's momentum vector
-        double newMomentum[4] = {tStep/stepSize, rStep/stepSize, thStep/stepSize, phiStep/stepSize};
+        newMomentum[0] = tStep/stepSize;
+        newMomentum[1] = rStep/stepSize;
+        newMomentum[2] = thStep/stepSize;
+        newMomentum[3] = phiStep/stepSize;
         photon.updateMomentum(newMomentum);
 
-        i++;  //incrementing the integration counter
+        //Incrementing the integration counter
+        i++;
 	}
-
-}  //end of main function
+}

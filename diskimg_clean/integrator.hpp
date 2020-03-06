@@ -19,6 +19,8 @@ class Integrator {
 
         void refineStepSize(Photon photon, Metric metric, double kR, double kTh, double kPhi);
 
+        bool hasHitDisk(Photon photon, Disk disk);
+
         void propagate(Metric metric, Photon photon, Disk disk);  
 };
 #endif //INTEGRATOR_H

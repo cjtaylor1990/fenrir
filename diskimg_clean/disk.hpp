@@ -14,8 +14,6 @@ class Disk {
 
 		double scaleHeight(double position[4]);
 
-		bool isAbove(double position);
-
 		double diskPhiVel(Metric metric, double position[4]);
 
 		double diskTdot(Metric metric, double position[4]);
