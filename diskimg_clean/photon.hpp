@@ -5,31 +5,44 @@
 #define PHOTON_H
 
 class Photon {
-	double r, phi, theta, time;
+	double position[4];
+
+	double momentum[4];
 
 	double energy, angMom, carter;
 
+	double rSwitch, thetaSwitch;
+
 	public:
-		Photon(double newR, double newPhi, double newTheta, double newTime, double newEnergy, double newAngMom, double newCarter);
+		Photon(double newPosition[4], double newEnergy, double newAngMom, double newCarter, double newRswitch, double newThetaSwitch);
 
-		double getRadius();
+		double time();
+
+		double radius();
+
+		double theta();
+
+		double phi();
+
+		double getRswitch();
+
+		double getThetaSwitch();
+
+		void updatePosition(double newPosition[4]);
+
+		void updateMomentum(double newMomentum[4]);
+
+		void updateRswitch(double newRswitch);
+
+		void updateThetaSwitch(double newThetaSwitch);
 		
-		double getPhi();
+		double tdot(Metric metric, double testPosition[4]);
 
-		double getTheta();
+		double phidot(Metric metric, double testPosition[4]);
 
-		double getTime();
+		double thdotsq(Metric metric, double testPosition[4]);
 
-		void updatePosition(double newR, double newPhi, double newTheta, double newTime);
-		
-		double tdot(Metric metric);
-
-		double phidot(Metric metric);
-
-		double thdotsq(Metric metric);
-
-		double rdotsq(Metric metric);
-
+		double rdotsq(Metric metric, double testPosition[4]);
 };
 
-#endif //METRIC_H
+#endif //PHOTON_H

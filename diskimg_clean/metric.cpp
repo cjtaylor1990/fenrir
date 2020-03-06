@@ -3,41 +3,47 @@
 
 Metric::Metric(double spin) {
     a = spin; 
+	rEvent = 1. + sqrt(1.-(a*a));
 }
 
-double Metric::getSpin() {
+double Metric::spin() {
     return a;
 }
 
-double Metric::sigma(double r, double phi, double theta, double time){
-    double cosTerm = std::cos(theta);
-	return (r*r)+(a*a*cosTerm*cosTerm);
+double Metric::eventHorizon() {
+	return rEvent;
 }
 
-double Metric::delta(double r, double phi, double theta, double time){
-	return (r*r)+(-2.*r)+(a*a);
+double Metric::sigma(double position[4]){
+    double cosTerm = std::cos(position[2]);
+
+	return (position[1]*position[1])+(a*a*cosTerm*cosTerm);
 }
 
-double Metric::gTT(double r, double phi, double theta, double time){
-	return -1.*(1.-(2.*r/sigma(r,phi,theta,time)));
+double Metric::delta(double position[4]){
+	return (position[1]*position[1])+(-2.*position[1])+(a*a);
 }
 
-double Metric::gTPh(double r, double phi, double theta, double time){
-    return (-2.*a*r*pow(std::sin(theta),2.))/sigma(r,phi,theta,time);
+double Metric::gTT(double position[4]){
+	return -1.*(1.-(2.*position[1]/sigma(position)));
 }
 
-double Metric::gPhT(double r, double phi, double theta, double time){
-    return (-2.*a*r*pow(std::sin(theta),2.))/sigma(r,phi,theta,time);
+double Metric::gTPh(double position[4]){
+    return (-2.*a*position[1]*pow(std::sin(position[2]),2.))/sigma(position);
 }
 
-double Metric::gRR(double r, double phi, double theta, double time){
-    return sigma(r,phi,theta,time)/delta(r,phi,theta,time);
+double Metric::gPhT(double position[4]){
+    return (-2.*a*position[1]*pow(std::sin(position[2]),2.))/sigma(position);
 }
 
-double Metric::gThTh(double r, double phi, double theta, double time){
-    return sigma(r,phi,theta,time);
+double Metric::gRR(double position[4]){
+    return sigma(position)/delta(position);
 }
 
-double Metric::gPhPh(double r, double phi, double theta, double time){
-    return (pow(r,2.)+pow(a,2.)+((2.*r*pow(a*std::sin(theta),2.))/sigma(r,phi,theta,time)))*pow(std::sin(theta),2.);
+double Metric::gThTh(double position[4]){
+    return sigma(position);
+}
+
+double Metric::gPhPh(double position[4]){
+    return (pow(position[1],2.)+pow(a,2.)+((2.*position[1]*pow(a*std::sin(position[2]),2.))/sigma(position)))*pow(std::sin(position[2]),2.);
 }

@@ -17,9 +17,9 @@ int main(int argc, char* argv[]){
 	int totProcs = atoi(argv[2]); //total number of processes
 	int procNum = atoi(argv[3]); //index number of process (starts at 0)
 	int colPerProc = n/totProcs; //calculating columns per parallel process
-    
-    //Physical parameters
-    a = atof(argv[4]); //black hole spin (dimensionless)
+	
+	//Physical parameters
+	a = atof(argv[4]); //black hole spin (dimensionless)
 	inclination = acos(atof(argv[5])); //disk inclination (degrees)
 	
 	//Accretion parameters (initAcc > finalAcc)
@@ -76,39 +76,39 @@ int main(int argc, char* argv[]){
 		fileIndex += 1;
 	}
 	
-    //Looping over NxN image plane
-    int j,k; //defining looping dummy variables. j is x variable. k is y variable
-    
-    //Accretion rate dummy variable
-    int thicknessIndex;
+	//Looping over NxN image plane
+	int j,k; //defining looping dummy variables. j is x variable. k is y variable
+	
+	//Accretion rate dummy variable
+	int thicknessIndex;
 
-    j = procNum*colPerProc; //setting dummy j to 0
-    while (j < (procNum+1)*colPerProc){
-        k = 0;//procNum*rowsPerProc; //resetting k dummy variable to starting value
-        while (k < n){//(procNum+1)*rowsPerProc){
-            //std::cout << j << " " << k << "\n";
-            imgX = ((j - (n/2.))+0.5)*(imgSize/n); //calculating x value for j value, could always do it outside of loop to not have to constantly do calculation
-            imgY = ((k - (n/2))+0.5)*(imgSize/n); //calculating y value for k value
-            imgB = pow(pow(imgX,2.)+pow(imgY,2.),0.5); //calculating Euclidean 2-D distance on image plane
+	j = procNum*colPerProc; //setting dummy j to 0
+	while (j < (procNum+1)*colPerProc){
+		k = 0;//procNum*rowsPerProc; //resetting k dummy variable to starting value
+		while (k < n){//(procNum+1)*rowsPerProc){
+			//std::cout << j << " " << k << "\n";
+			imgX = ((j - (n/2.))+0.5)*(imgSize/n); //calculating x value for j value, could always do it outside of loop to not have to constantly do calculation
+			imgY = ((k - (n/2))+0.5)*(imgSize/n); //calculating y value for k value
+			imgB = pow(pow(imgX,2.)+pow(imgY,2.),0.5); //calculating Euclidean 2-D distance on image plane
 
-            //calculating the phi angular momentum and carter constant of photon from image plane coordinates
-            angmom = -1.*imgB*std::sin(inclination)*(imgX/imgB); //phi angular momentum
-            carter = pow(imgB*(imgY/imgB),2.) - energy*pow(a*std::cos(initTheta),2.) + pow(angmom*std::cos(initTheta)/std::sin(initTheta), 2.); //carter constant
+			//calculating the phi angular momentum and carter constant of photon from image plane coordinates
+			angmom = -1.*imgB*std::sin(inclination)*(imgX/imgB); //phi angular momentum
+			carter = pow(imgB*(imgY/imgB),2.) - energy*pow(a*std::cos(initTheta),2.) + pow(angmom*std::cos(initTheta)/std::sin(initTheta), 2.); //carter constant
 
 			//setting the switches for the sign of rdot and thetadot
-            rSqrtSwitch = 1.;
-            if (imgY < 0.){
-                thSqrtSwitch = -1.;
-            }else{
-                thSqrtSwitch = 1.;
-            }
+			rSqrtSwitch = 1.;
+			if (imgY < 0.){
+				thSqrtSwitch = -1.;
+			}else{
+				thSqrtSwitch = 1.;
+			}
 
 			//setting the initial values of the photon's position 4-vector to be found in the ic file
-            posVec[0] = initTime; //time
-            posVec[1] = initRadius; //spherical radius
-            posVec[2] = initTheta; //vertical angle theta
-            posVec[3] = initPhi; //horizontal angle phi
-            
+			posVec[0] = initTime; //time
+			posVec[1] = initRadius; //spherical radius
+			posVec[2] = initTheta; //vertical angle theta
+			posVec[3] = initPhi; //horizontal angle phi
+			
 			//Starting the propagation loop, where I will write to a different file for each Mdot value
 			thicknessIndex = 0;
 			while (thicknessIndex < numThickness){
@@ -120,42 +120,42 @@ int main(int argc, char* argv[]){
 				
 				if (posVec[1]*cos(posVec[2]) > scaleHeightFnct(posVec[1],posVec[2])){
 				
-            		//Propagate the photon from the observer to the disk
-            		propagate(posVec,momVec,dStep,tolerance,maxStep,rLimit,rEvent,scaleHeightValue,rProjected);
+					//Propagate the photon from the observer to the disk
+					propagate(posVec,momVec,dStep,tolerance,maxStep,rLimit,rEvent,scaleHeightValue,rProjected);
 				
 				}
-            	//Calculating the pseudo-cylindrical radius and the vertical height of the disk above the mid-plane
-            	rProjected = posVec[1]*std::sin(posVec[2]); //pseudo-cylindrical radius
-            	scaleHeightValue = posVec[1]*std::cos(posVec[2]);//heightFrontTerm*(1 - sqrt(rIsco/rProjected)); //vertical height of the disk above mid-plane
+				//Calculating the pseudo-cylindrical radius and the vertical height of the disk above the mid-plane
+				rProjected = posVec[1]*std::sin(posVec[2]); //pseudo-cylindrical radius
+				scaleHeightValue = posVec[1]*std::cos(posVec[2]);//heightFrontTerm*(1 - sqrt(rIsco/rProjected)); //vertical height of the disk above mid-plane
 
-            	//Calculating the one-form of the photon's momentum 4-vector
-            	vecToOneForm(posVec, momVec, momOneForm);
+				//Calculating the one-form of the photon's momentum 4-vector
+				vecToOneForm(posVec, momVec, momOneForm);
 
-            	//Calculating the disk's velocity 4-vector
+				//Calculating the disk's velocity 4-vector
 				diskVelocity(posVec, diskVelVec, scaleHeightValue, rProjected);
 			
-            	//Calculating the final energy of the photon (E = -p*U, dotting photon 4-momentum with disk 4-velocity)
-            	finalEnergy = (momOneForm[0]*diskVelVec[0]) + (momOneForm[1]*diskVelVec[1]) + (momOneForm[2]*diskVelVec[2]) + (momOneForm[3]*diskVelVec[3]);
-            	finalEnergy = -1.*finalEnergy;
+				//Calculating the final energy of the photon (E = -p*U, dotting photon 4-momentum with disk 4-velocity)
+				finalEnergy = (momOneForm[0]*diskVelVec[0]) + (momOneForm[1]*diskVelVec[1]) + (momOneForm[2]*diskVelVec[2]) + (momOneForm[3]*diskVelVec[3]);
+				finalEnergy = -1.*finalEnergy;
 
 				//Outputting data to 'myfile': x, y, g, final_t, final_r, final_theta, final_phi, disk_H, pseudo-cylindrical_r
-            	outStreams[thicknessIndex] << imgX << " " << imgY << " " << (energy/finalEnergy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << "\n";
+				outStreams[thicknessIndex] << imgX << " " << imgY << " " << (energy/finalEnergy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << "\n";
 				
 				//advancing the accretion index by 1
 				thicknessIndex += 1;
 			}
-            //advancing k by 1
-            k++;
-        }
-        //advancing j by 1
-        j++;
-    }
-    //closing the various output files to be saved by looping over the stream array
-    fileIndex = 0;
-    while (fileIndex < numThickness){
+			//advancing k by 1
+			k++;
+		}
+		//advancing j by 1
+		j++;
+	}
+	//closing the various output files to be saved by looping over the stream array
+	fileIndex = 0;
+	while (fileIndex < numThickness){
 		outStreams[fileIndex].close();
 		fileIndex += 1;
 	}
-    return 0;  //returning integer value of 0 if executed to completion
+	return 0;  //returning integer value of 0 if executed to completion
 
 }  //end of main function
