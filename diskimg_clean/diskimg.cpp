@@ -8,20 +8,7 @@
 #include "metric_kerr.h"
 #include "disk_equations_new.h"
 #include "propagate_rk4_thindisk_new.h"
-
-//This allows me to convert an integer into a string, overcoming the version problems on galaxy (outdated icc compiler)
-#include <string>
-#include <sstream>
-namespace patch
-{
-    template < typename T > std::string to_string( const T& nInput )
-    {
-        std::ostringstream stm ;
-        stm << nInput ;
-        return stm.str() ;
-    }
-}
-
+#include "string_patch.h"
 
 int main(int argc, char* argv[]){
 	
@@ -85,7 +72,7 @@ int main(int argc, char* argv[]){
 	std::string fileName;
 	int fileIndex = 0;
 	while (fileIndex < numThickness){
-		fileName = outFilePrefix + "_" + patch::to_string(fileIndex) + ".txt";
+		fileName = outFilePrefix + "_" + string_patch::to_string(fileIndex) + ".txt";
 		outStreams[fileIndex].open(fileName.c_str());
 		fileIndex += 1;
 	}
