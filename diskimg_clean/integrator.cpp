@@ -7,8 +7,7 @@
 
 //This is a function that will take in the initial position vector (posVec) and momentum vector (momVec) and integrate them forward, until rLimit or disk is reached, or it dies after so many steps
 
-Integrator::Integrator(Metric metric, double newStepSize, double newTolerance, double newNumMaxSteps, double horizonStop) {
-    stepSize = newStepSize;
+Integrator::Integrator(Metric metric, double newTolerance, double newNumMaxSteps, double horizonStop) {
     tolerance = newTolerance;
     maxNumSteps = newNumMaxSteps;
     rMin = metric.eventHorizon() + horizonStop;

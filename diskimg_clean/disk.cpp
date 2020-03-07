@@ -22,6 +22,10 @@ Disk::Disk(Metric metric, double newDiskThickness) {
 	diskThickness = newDiskThickness;
 }
 
+void Disk::updateDiskThickness(double newDiskThickness) {
+	diskThickness = newDiskThickness;
+}
+
 double Disk::scaleHeight(double position[4]) {
 	double r = cylindricalR(position);
 	if (r < rIsco){

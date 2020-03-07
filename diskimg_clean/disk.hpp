@@ -12,6 +12,8 @@ class Disk {
 
 		Disk(Metric metric, double newDiskThickness);
 
+		void updateDiskThickness(double newDiskThickness);
+
 		double scaleHeight(double position[4]);
 
 		double diskPhiVel(Metric metric, double position[4]);

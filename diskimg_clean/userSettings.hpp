@@ -7,7 +7,7 @@ namespace userSettings {
     double initRadius;
     double initPhi;
 
-    double maxStepNumber;
+    int maxStepNumber;
     double horizonStop;
     double tolerance;
 

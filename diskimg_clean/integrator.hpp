@@ -13,7 +13,7 @@ class Integrator {
     double stepSize, tolerance, maxNumSteps, rMin;
 
     public:
-        Integrator(Metric metric, double newStepSize, double newTolerance, double newMaxStep, double horizonStop);
+        Integrator(Metric metric, double newTolerance, double newMaxStep, double horizonStop);
 
         void checkSwitches(Photon photon, double kRsq, double kThSq);
 
