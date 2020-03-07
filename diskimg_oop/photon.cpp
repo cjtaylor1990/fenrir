@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include "photon.hpp"
 #include "metric.hpp"
 
@@ -74,7 +75,7 @@ double Photon::tdot(Metric metric, double testPosition[4]){
     double sinTerm = std::sin(theta);
 
     double energyTerm = ((metric.sigma(testPosition)*((r*r)+(a*a)))+(2.*r*a*a*sinTerm*sinTerm))*energy;
-	double angmomTerm = -2.*a*r*Photon::angMom;
+	double angmomTerm = -2.*a*r*angMom;
 	double bottomTerm1 = (metric.sigma(testPosition) - (2.*r))*((r*r)+(a*a));
     double bottomTerm2 = 2.*r*a*a*sinTerm*sinTerm;
 	

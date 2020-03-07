@@ -41,6 +41,12 @@ int main(int argc, char* argv[]){
 	//Instantiating the Metric
 	Metric metric(spin);
 
+	//Instantiating the disk with the initial thickness
+	Disk disk(metric, initThickness);
+
+	//Instantiating the integrator
+	Integrator integrator(metric, userSettings::tolerance, userSettings::maxStepNumber, userSettings::horizonStop);
+
 	//Constructing the inital position vector (place of observer)
 	double initPosition[4] = {userSettings::initTime, userSettings::initRadius, inclination, userSettings::initPhi};
 	
@@ -84,12 +90,6 @@ int main(int argc, char* argv[]){
 
 			//instantiating the photon
 			Photon photon(initPosition, photonEnergy, photonAngMomentum, photonCarter, photonRswitch, photonThetaSwitch);
-			
-			//Instantiating the disk with the initial thickness
-			Disk disk(metric, initThickness);
-
-			//Instantiating the integrator
-			Integrator integrator(metric, userSettings::tolerance, userSettings::maxStepNumber, userSettings::horizonStop);
 
 			//Starting the propagation loop, where I will write to a different file for each Mdot value
 			thicknessIndex = 0;
@@ -98,7 +98,8 @@ int main(int argc, char* argv[]){
 				double currentThickness = initThickness + (thicknessIndex*deltaThickness);
 				disk.updateDiskThickness(currentThickness);
 				
-				if (integrator.hasHitDisk(photon, disk)) {
+				std::cout << integrator.hasHitDisk(photon, disk) << "\n";
+				if (!integrator.hasHitDisk(photon, disk)) {
 				
 					//Propagate the photon from the observer to the disk
 					integrator.propagate(metric, photon, disk);
@@ -129,7 +130,9 @@ int main(int argc, char* argv[]){
 				
 				//advancing the accretion index by 1
 				thicknessIndex += 1;
+
 			}
+
 			//advancing k by 1
 			k++;
 		}

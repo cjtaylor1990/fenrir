@@ -38,7 +38,7 @@ void Integrator::refineStepSize(Photon photon, Metric metric, double kR, double 
 
 bool Integrator::hasHitDisk(Photon photon, Disk disk) {
     double position[4] = {photon.time(), photon.radius(), photon.theta(), photon.phi()};
-    return verticalHeight(position) <= disk.scaleHeight(position);
+    return (verticalHeight(position) <= disk.scaleHeight(position));
 }
 
 void Integrator::propagate(Metric metric, Photon photon, Disk disk){
@@ -68,7 +68,7 @@ void Integrator::propagate(Metric metric, Photon photon, Disk disk){
 	int i = 0;
 
     //starting main processing loop.  Will continue while i is less than the maximum number of steps and the radial distance is less than the minimal value specified
-	while ((i < maxNumSteps) && (photon.radius() > rMin) && (hasHitDisk(photon, disk))) {
+	while ((i < maxNumSteps) && (photon.radius() > rMin) && (!hasHitDisk(photon, disk))) {
         
         //Setting first test position
         testPosition[0] = photon.time();
@@ -88,6 +88,8 @@ void Integrator::propagate(Metric metric, Photon photon, Disk disk){
         //Taking sqrt of r^2 and theta^2, setting sign to be consistent with switches
         kRarray[0] = photon.getRswitch()*sqrt(std::fabs(kRsqArray[0]));
         kThArray[0] = photon.getThetaSwitch()*sqrt(std::fabs(kThSqArray[0]));
+
+        std::cout << kTarray[0] << " " << kRsqArray[0] << " " << kThSqArray[0] << " " << kPhiArray[0] << "\n";
 
         refineStepSize(photon, metric, kRarray[0], kThArray[0], kPhiArray[0]);
 
