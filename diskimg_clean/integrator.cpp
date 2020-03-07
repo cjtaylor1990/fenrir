@@ -113,7 +113,7 @@ void Integrator::propagate(Metric metric, Photon photon, Disk disk){
         //Setting third test position
         testPosition[0] = photon.time() + (stepSize/2.)*kTarray[1];
         testPosition[1] = photon.radius() + (stepSize/2.)*kRarray[1];
-        testPosition[2] = photon.theta(); + (stepSize/2.)*kThArray[1];
+        testPosition[2] = photon.theta() + (stepSize/2.)*kThArray[1];
         testPosition[3] = photon.phi() + (stepSize/2.)*kPhiArray[1];
 
         //Third set of k's for rk4 integration

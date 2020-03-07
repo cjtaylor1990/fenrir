@@ -10,6 +10,7 @@
 #include "integrator.hpp"
 #include "stringPatch.hpp"
 
+
 int main(int argc, char* argv[]){
 	
 	//Photon number and parallelization information
@@ -97,29 +98,34 @@ int main(int argc, char* argv[]){
 				double currentThickness = initThickness + (thicknessIndex*deltaThickness);
 				disk.updateDiskThickness(currentThickness);
 				
-				if (integrator.hasHitDisk(photon, disk) {
+				if (integrator.hasHitDisk(photon, disk)) {
 				
 					//Propagate the photon from the observer to the disk
 					integrator.propagate(metric, photon, disk);
 				
 				}
 
+				double finalPosition[4] = {photon.time(), photon.radius(), photon.theta(), photon.phi()};
+				double finalMomentum[4];
+				photon.getMomentum(finalMomentum);
+
 				//Calculating the pseudo-cylindrical radius and the vertical height of the disk above the mid-plane
-				rProjected = cylindricalR({photon.time(), photon.radius(), photon.theta(), photon.phi()}); 
-				scaleHeightValue = disk.scaleHeight({photon.time(), photon.radius(), photon.theta(), photon.phi()});
+				double rProjected = cylindricalR(finalPosition); 
+				double scaleHeightValue = disk.scaleHeight(finalPosition);
 
 				//Calculating the one-form of the photon's momentum 4-vector
-				vecToOneForm(posVec, momVec, momOneForm);
+				double momentumOneForm[4];
+				metric.vectorToOneForm(finalPosition, finalMomentum, momentumOneForm);
 
 				//Calculating the disk's velocity 4-vector
-				diskVelocity(posVec, diskVelVec, scaleHeightValue, rProjected);
+				double diskVelocity[4] = {disk.diskTdot(metric, finalPosition), disk.diskRdot(metric, finalPosition), disk.diskThDot(metric, finalPosition), disk.diskPhiDot(metric, finalPosition)};
 			
 				//Calculating the final energy of the photon (E = -p*U, dotting photon 4-momentum with disk 4-velocity)
-				finalEnergy = (momOneForm[0]*diskVelVec[0]) + (momOneForm[1]*diskVelVec[1]) + (momOneForm[2]*diskVelVec[2]) + (momOneForm[3]*diskVelVec[3]);
+				double finalEnergy = (momentumOneForm[0]*diskVelocity[0]) + (momentumOneForm[1]*diskVelocity[1]) + (momentumOneForm[2]*diskVelocity[2]) + (momentumOneForm[3]*diskVelocity[3]);
 				finalEnergy = -1.*finalEnergy;
 
 				//Outputting data to 'myfile': x, y, g, final_t, final_r, final_theta, final_phi, disk_H, pseudo-cylindrical_r
-				outStreams[thicknessIndex] << imgX << " " << imgY << " " << (energy/finalEnergy) << " " << posVec[0] << " " << posVec[1] << " " << posVec[2] << " " << posVec[3] << " " << scaleHeightValue << " " << rProjected << "\n";
+				outStreams[thicknessIndex] << photonImgX << " " << photonImgY << " " << (observer.energy(metric, photonImgX, photonImgY)/finalEnergy) << " " << finalPosition[0] << " " << finalPosition[1] << " " << finalPosition[2] << " " << finalPosition[3] << " " << scaleHeightValue << " " << rProjected << "\n";
 				
 				//advancing the accretion index by 1
 				thicknessIndex += 1;

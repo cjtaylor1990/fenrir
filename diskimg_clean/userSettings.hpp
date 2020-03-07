@@ -3,13 +3,13 @@
 
 namespace userSettings {
     
-    double initTime;
-    double initRadius;
-    double initPhi;
+    double initTime = 0.0;
+    double initRadius = 1000.0;
+    double initPhi = 0.0;
 
-    int maxStepNumber;
-    double horizonStop;
-    double tolerance;
+    int maxStepNumber = 100000000;
+    double horizonStop = 0.01;
+    double tolerance = 1000.0;
 
 }
 

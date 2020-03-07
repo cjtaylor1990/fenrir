@@ -44,12 +44,27 @@ void Photon::updateMomentum(double newMomentum[4]) {
 	momentum[3] = newMomentum[3];
 }
 
+void Photon::getMomentum(double vector[4]) {
+    vector[0] = momentum[0];
+    vector[1] = momentum[1];
+    vector[2] = momentum[2];
+    vector[3] = momentum[3];
+}
+
 void Photon::updateRswitch(double newRswitch) {
 	rSwitch = newRswitch;
 }
 
 void Photon::updateThetaSwitch(double newThetaSwitch) {
 	thetaSwitch = newThetaSwitch;
+}
+
+double Photon::getRswitch() {
+    return rSwitch;
+}
+
+double Photon::getThetaSwitch() {
+    return thetaSwitch;
 }
 
 double Photon::tdot(Metric metric, double testPosition[4]){

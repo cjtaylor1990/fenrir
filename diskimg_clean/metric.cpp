@@ -47,3 +47,21 @@ double Metric::gThTh(double position[4]){
 double Metric::gPhPh(double position[4]){
     return (pow(position[1],2.)+pow(a,2.)+((2.*position[1]*pow(a*std::sin(position[2]),2.))/sigma(position)))*pow(std::sin(position[2]),2.);
 }
+
+void Metric::vectorToOneForm(double position[4], double vector[4], double oneForm[4]){
+
+    //Calculating Kerr components
+    double gTTval = gTT(position);
+    double gPhTval = gPhT(position);
+    double gTPhVal = gPhTval;
+    double gRRval = gRR(position);
+    double gThThVal = gThTh(position);
+    double gPhPhVal = gPhPh(position);
+
+    //Performing conversion
+    oneForm[0] = gTTval*vector[0] + gTPhVal*vector[3];
+    oneForm[1] = gRRval*vector[1];
+    oneForm[2] = gThThVal*vector[2];
+    oneForm[3] = gPhTval*vector[0] + gPhPhVal*vector[3];
+
+}

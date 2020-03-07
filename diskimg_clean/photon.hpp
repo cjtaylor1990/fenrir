@@ -27,6 +27,8 @@ class Photon {
 		double getRswitch();
 
 		double getThetaSwitch();
+		
+		void getMomentum(double vector[4]);
 
 		void updatePosition(double newPosition[4]);
 

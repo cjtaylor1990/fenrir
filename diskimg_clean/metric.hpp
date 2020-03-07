@@ -28,5 +28,7 @@ class Metric {
         double gThTh(double position[4]);
 
         double gPhPh(double position[4]);
+
+        void vectorToOneForm(double position[4], double vector[4], double oneForm[4]);
 };
 #endif //METRIC_H
